@@ -1,0 +1,607 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{fullpage}
+\usepackage{pdfpages}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{url}
+\usepackage{multirow}
+% 為了讓表格緊密
+\usepackage{float}
+% 為了首行空格
+%\usepackage{indentfirst}
+% % 為表格添加 footnote
+% \usepackage{tablefootnote}
+
+% for Chinese
+\usepackage{fontspec} % 加這個就可以設定字體
+\usepackage[BoldFont, SlantFont]{xeCJK} % 讓中英文字體分開設置
+\setCJKmainfont{TW-Sung} % 設定中文為系統上的字型，而英文不去更動，使用原TeX\字型
+\renewcommand{\baselinestretch}{1.4}
+
+\parskip=5pt
+\parindent=24pt
+\newtheorem{lemma}{Lemma}
+\newtheorem{ques}{Question}
+\newtheorem{prop}{Proposition}
+\newtheorem{defn}{Definition}
+\newtheorem{rmk}{Remark}
+\newtheorem{note}{Note}
+\newtheorem{eg}{Example}
+\newtheorem{aspt}{Assumption}
+
+\definecolor{emphOrange}{RGB}{247, 80, 0}
+\definecolor{stringGray}{RGB}{109, 109, 109}
+\definecolor{commentGreen}{RGB}{0, 96, 0}
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+%  xleftmargin=\parindent,
+  language = SQL,
+  showstringspaces=false,
+  basicstyle = \ttfamily, 
+  keywordstyle = \bfseries\color{blue}, 
+  emph = {symbol1, symbol2},
+  emphstyle = \color{red},
+  emph = {[2]symbol3, symbol4},
+  emphstyle = {[2]\color{emphOrange}},
+  commentstyle = \color{commentGreen}, 
+  stringstyle = \color{stringGray}, 
+%  backgroundcolor = \color{white}, 
+%  numbers = left, % 沒有行號，複製貼上測試程式會比較方便
+%  numberstyle = \normalsize, 
+%	stepnumber = 1, 
+%  numbersep = 10pt, 
+%  title = ,
+}
+
+% "摘要", "表", "圖", "參考文獻"
+\renewcommand{\abstractname}{\bf 摘要}
+\renewcommand{\tablename}{表}
+\renewcommand{\figurename}{圖}
+\renewcommand{\refname}{\bf 參考文獻}
+\renewcommand{\labelenumii}{\alph{enumii}.}
+
+
+\begin{document}
+
+\title{}
+\author{}
+\date{}
+% \maketitle
+%\fontsize{20}{20pt}\selectfont
+
+\begin{center}
+\textbf{\Large 資料庫管理\\
+期末專案計劃書 \\[.5cm]
+第35組 } \\[10pt]
+B09303131 馬松鐸、B10303091 洪榮盛、B11705039 李盈盈
+\end{center}
+
+
+\section{系統分析}
+% 系統有哪些使用者、他們可以操作這個系統做些什麼
+
+\subsection{系統介紹}
+
+你的學生證又、又、又不見了嗎？你又、又、又在校園中撿到別人的學生證了嗎？快來「NTULOST」協尋和發布吧！
+
+在台大學生的日常生活中，遺失物品（如學生證、鑰匙、書籍等）或撿到他人遺失的物品是一個常見的問題。目前大多數協尋需求都是透過臉書的「NTU台大學生交流版」發布，但交流版本該是提供學生交流意見的平台，近年來層出不窮的協尋文和拾獲章往往佔據了交流版大多數的版面，尤其大概每五篇文章就會有一篇文章是在協尋丟失在校園某處的「學生證」。
+
+然而，在交流版發佈的文章容易被淹沒、且管理效率不佳。因此，我們規劃一個專門的平台，提供台大生活圈（學生、教師、行政人員、校外人士）的人們協助尋找遺失物和回報拾獲物。系統還將提供懸賞機制、用戶之間的互動（如在貼文底下留言、私訊）、用戶回饋等功能，以及管理者對用戶的通知及系統維護管理功能。
+
+根據不同的功能及掌控權限，「NTULOST」系統的用戶可以分為兩種身分，分別是User及Admin。若作為一般使用者，身分別定義為User。註冊為會員後，可以依照自身需求，選擇發佈協尋文或尋獲文。如果是要協尋的話，可以提供可能遺失時間、遺失地點、物品類別、是否要懸賞及懸賞的內容、圖片等資訊。如果是尋獲的話，可以提供尋獲時間、尋獲地點、物品類別、目前存放的地點、圖片等資訊。並且可以透過用戶間的訊息、在貼文下留言、用戶回饋等功能交流資訊，若非會員，僅能透過官方協助發布。若作為管理者，身分別定義為Admin。可以做到針對非會員發布的文章進行審核，並針對管理所有文章及用戶的基本資訊與歷史活動記錄，以及發布通知公告是否有類似的匹配結果及接受用戶回饋。
+
+
+% 功能概述
+
+\subsection{系統功能}    
+
+\subsubsection{相關設定}
+
+在「NTULOST」的相關設定中，平台會根據用戶的身份進行功能分配。用戶分為會員和非會員兩種類別。會員需要註冊並登入平台，才能享有完整的功能，包括發布協尋和拾獲通報、設置懸賞、與其他用戶互動、接收通知、管理通報進度等。這些功能針對台大生活圈中的學生、教職員和校外人士，旨在促進協尋效率並確保資訊的時效性和精確性。
+
+非會員則以訪客身份使用平台，適合那些不常使用平台或不願意註冊的校外人士。非會員可以提交拾獲物通報，由管理者審核後代為發布，但無法使用留言、私訊和自定義通知功能。這樣的設計是為了簡化非會員的使用流程，同時也能維持平台的互動品質。
+
+通報發布和管理的功能設計，主要是幫助用戶更方便地報告和尋找遺失或拾獲的物品。用戶在發布協尋通報時，需提供詳細的物品資訊，包括名稱、特徵描述、遺失地點與時間、聯絡方式，並可以選擇設置懸賞來提高找回物品的機率。拾獲通報則需要提供尋獲地點、時間和物品特徵，並上傳照片幫助確認。
+
+為了提高搜尋的效率，平台設置了多種篩選條件，包括物品類型、地點和時間範圍等。用戶可以利用這些條件篩選或直接輸入關鍵字來搜尋相關的協尋或拾獲通報，以便快速找到目標資訊。在系統通知方面，設置了多樣的提醒方式，以確保用戶在協尋進展中不會錯過重要訊息。此外，平台會持續收集用戶的回饋，根據需求進行系統優化和功能改進，如添加新的篩選條件或通知方式，讓平台更符合用戶的需求。
+
+
+\subsubsection{給 User 的功能}
+
+在本系統中，User 可以執行以下功能：
+\begin{enumerate}
+\item 
+
+遺失物/拾獲物通報發布
+\begin{enumerate}
+    \item 用戶可以在平台上發布遺失物或拾獲物的通報，並填寫詳細的資訊（如物品名稱、特徵描述、遺失/拾獲的地點與時間、物品照片等）。
+    \item 用戶可選擇是否設置懸賞來提升協尋效率，懸賞內容由用戶自行設定。
+\end{enumerate}
+
+\item 
+
+協尋資訊瀏覽與搜尋
+\begin{enumerate}
+    \item 平台提供多種篩選條件（如物品類型、地點、時間）來幫助用戶快速找到相關的協尋資訊。
+\end{enumerate}
+
+\item 
+
+用戶之間的互動
+\begin{enumerate}
+    \item 提供留言功能，讓用戶可以在協尋或拾獲通報下留言，進行公開的訊息交流。
+    \item 支援私訊功能，用戶可選擇直接私下聯繫通報者，以獲取更多詳細資訊或討論物品歸還事宜。
+\end{enumerate}
+
+\item 
+
+用戶資料管理與追蹤
+\begin{enumerate}
+    \item 用戶可以查看自己發布過的協尋或拾獲通報，並對其進行更新或刪除。
+    \item 支援查看協尋進度，當該通報有新進展時系統會自動提醒。
+\end{enumerate}
+
+\item 
+
+通知與提醒功能
+\begin{enumerate}
+    \item 系統會針對重要進展（如有人發現可能匹配的物品或有新的留言）及時發送通知。
+    \item 用戶可自定義通知的類型與接收方式（如電子郵件、APP推播等）。
+\end{enumerate}
+
+
+\end{enumerate}
+
+   
+\subsubsection{給 Admin 的功能}
+
+在本系統中，Admin 可以執行以下功能：
+\begin{enumerate}
+\item 
+
+資訊管理
+\begin{enumerate}
+    \item 管理者可對所有協尋/拾獲通報進行審核和管理，確保平台內容的準確性與適當性。
+    \item 針對違規或不適當內容，管理者可執行修改或刪除操作。
+\end{enumerate}
+
+\item 
+
+用戶管理
+\begin{enumerate}
+    \item 管理者可以查看並管理用戶的基本資訊與歷史活動記錄，處理違規行為或異常狀況。
+    \item 管理者可發送公告或通知，提醒用戶重要的系統更新或協尋進展。
+\end{enumerate}
+
+\item 
+
+系統監控與維護
+\begin{enumerate}
+    \item 進行系統運行狀況的監控，定期檢查伺服器負載及資料庫狀態，確保系統穩定性。
+    \item 定期備份資料庫，防止資料遺失。
+    \item 接收用戶回饋，並根據需要進行功能優化和系統升級。
+\end{enumerate}
+
+
+\end{enumerate}
+
+
+\section{系統設計}
+% 1. ER diagram
+% 2. database schema
+% 3. data dictionary
+% 4. normalization 
+
+\subsection{ER Diagram}
+
+\vspace*{1cm}
+\begin{figure}[hbt]
+    \hspace*{-2.5cm}\includegraphics[width=\paperwidth]{er_1.png}
+    \caption{「NTULOST」的 ER Diagram}
+    \label{fig:erDiagram}
+\end{figure}
+
+\newpage
+此 ERD 中，物品（\verb|Item|）與使用者（\verb|User|）為較主要的實體（entity），又分別衍生出會員（\verb|Member|）與尋獲物、遺失物（\verb|FoundItem, LostItem|）兩組弱實體（weak entity）。
+由圖中可以得知，「發文（\verb|posts|）」、「留言（\verb|comments|）」、「回饋（\verb|gives Feeback|）」與「私訊（\verb|messages|）」是僅限於會員能使用的功能，剩餘的「歸還或認領（\verb|returns_or_claims|）」與「通知（\verb|notifies|）」則對所有使用者皆開放。
+
+除此之外，地點（\verb|Location|）為剩餘實體中相對較複雜的實體，它與物品（\verb|Item|）以「位在（\verb|locates|）」連結，紀錄物品被找到或（可能）被遺失的地點（當然也有可能失主並沒有辦法提供可能遺失的地點，所以物品到地點之間的關聯為 (0,1)）；
+而它還與尋獲物（\verb|FoundItem|）以「存放（\verb|stores|）」連結，紀錄遺失物被存放的地點，因遺失物（\verb|LostItem|）並不需要有這方面的紀錄，此部分就沒有與其有所連結。
+
+另外，懸賞（\verb|Reward|）只有在失主想懸賞遺失物時才會需要，因此只與遺失物（\verb|LostItem|）連結，且可能一個遺失物會有多種懸賞品（若需要改變懸賞品的數量而不是類型，可直接修改數量（\verb|Amount|），不需要額外建立一份懸賞），若將它們以編號全部分開又意義不大，因此最後是將懸賞設定為遺失物衍生的弱實體。
+
+最後值得一提的是，同一個物品（\verb|Item|）可能會同時屬於（\verb|belongs|）多個類別（\verb|Category|）的特性，我們並不會限制一個物品只會屬於一個類別，也能使關聯搜尋系統更為有效。
+
+\subsection{Relational Database Schema Diagram}
+\label{subsection:schema}
+
+根據前頁的 ERD 可以轉換成下頁的 Database Schema，共含有 17 個關聯（relation）。
+
+大部分較清楚（PK 只有一兩個）的關聯就不在此多做描述，可以從圖中看到，「歸還或認領（\verb|RETURNS_OR_CLAIMS|）」、「通知（\verb|NOTIFIES|）」、「留言（\verb|COMMENTS|」、「私訊（\verb|MESSAGE|）」與「回饋（FEEDBACK）」
+皆以一個或多個 \verb|ID| 與時間（\verb|Time|）組成 PK，我們認為這樣做比新增編號、流水號更為有意義，因此不選擇額外新增編號、流水號作為 PK，以利資料的閱讀與簡潔。
+
+\newpage
+% \includepdf[scale=.8]{pre}
+\vspace*{-3.5cm}\includegraphics[scale=.7,page=2]{pre.pdf}
+\vspace*{-2.3cm}
+\begin{figure}[H]
+    \caption{「NTULOST」的 Relational Database Schema Diagram}
+    \label{fig:schemaDiagram}
+\end{figure}
+\newpage
+
+
+\subsection{Data Dictionary}
+
+「NTULOST」的資料表共有圖 \ref{fig:schemaDiagram} 所示的 17 個，各個資料表的欄位相關資訊依序呈現在表 \ref{tab:item} 到表 \ref{tab:fb}。
+
+% ITEM
+\begin{table}[H]
+    \centering
+    \resizebox{.8\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\ 
+    \midrule
+        ItemID & 物品編號 & char(10) & PK & Not Null, Unique & ~ \\ 
+        Description & 物品描述 & text & ~ & Not Null & ~ \\ 
+        ImageURL & 物品圖片連結 & text & ~ & ~ & ~ \\ 
+    \bottomrule
+    \end{tabular}}
+    \caption{資料表 ITEM 的欄位資訊} 
+    \label{tab:item}
+\end{table}
+
+% LOST_ITEM
+\begin{table}[H]
+    \centering
+    \resizebox{.9\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\ 
+    \midrule
+        ItemID & 物品編號 & char(10) & PK, FK: ITEM(ItemID) & Not Null, Unique & ~ \\ 
+        LostTime & 遺失時間 & timestamp & ~ & Not Null & ~ \\ 
+    \midrule
+        Referential triggers & ~ & On Delete & On Update & ~ \\ 
+    \midrule
+        \multicolumn{2}{l}{ItemID: ITEM(ItemID)} & Cascade & Cascade \\ 
+    \bottomrule
+    \end{tabular}}
+    \caption{資料表 LOST\_ITEM 的欄位資訊} 
+\end{table}
+
+% FOUND_ITEM
+\begin{table}[H]
+    \centering
+    \resizebox{\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\ 
+    \midrule
+        ItemID & 物品編號 & char(10) & PK, FK: ITEM(ItemID) & Not Null, Unique & ~ \\ 
+        FoundTime & 尋獲時間 & timestamp & ~ & Not Null & ~ \\  
+    \midrule
+        Referential triggers & ~ & On Delete & On Update & ~ \\ 
+    \midrule 
+        \multicolumn{2}{l}{ItemID: ITEM(ItemID)} & Cascade & Cascade \\ 
+    \bottomrule
+    \end{tabular}}
+    \caption{資料表 FOUND\_ITEM 的欄位資訊}
+\end{table}
+
+% LOCATES
+\begin{table}[H]
+    \centering
+    \resizebox{1\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\
+    \midrule
+        ItemID & 物品編號 & char(10) & PK, FK: ITEM(ItemID) & Not Null, Unique & ~ \\ 
+        LocationID & 地點編號 & char(10) & FK: LOCATION(LocationID) & Not Null & ~ \\
+    \midrule
+        Referential triggers & ~ & On Delete & On Update & ~ \\
+    \midrule
+        \multicolumn{2}{l}{ItemID: ITEM(ItemID)} & Cascade & Cascade \\  
+        \multicolumn{2}{l}{LocationID: LOCATION(LocationID)} & Cascade & Cascade \\  
+    \bottomrule
+    \end{tabular}}
+    \caption{資料表 LOCATES 的欄位資訊}
+\end{table}
+
+% STORES
+\begin{table}[H]
+    \centering
+    \resizebox{1\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\
+    \midrule
+        ItemID & 物品編號 & char(10) & PK, FK: ITEM(ItemID) & Not Null & ~ \\ 
+        LocationID & 地點編號 & char(10) & FK: LOCATION(LocationID) & Not Null & ~ \\ 
+        StartTime & 開始存放時間 & timestamp & ~ & Not Null & ~ \\
+        FinishTime & 結束存放時間 & timestamp & ~ & ~ & ~ \\
+    \midrule
+        Referential triggers & ~ & On Delete & On Update & ~ \\
+    \midrule
+        \multicolumn{2}{l}{ItemID: ITEM(ItemID)} & Cascade & Cascade \\  
+        \multicolumn{2}{l}{LocationID: LOCATION(LocationID)} & Cascade & Cascade \\  
+    \bottomrule
+    \end{tabular}}
+    \caption{資料表 STORES 的欄位資訊}
+\end{table}
+
+% LOCATION
+\begin{table}[H]
+    \centering
+    \resizebox{.9\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\
+    \midrule
+        LocationID & 地點編號 & char(10) & PK & Not Null, Unique & ~ \\ 
+        LocationDescription & 地點描述 & text & ~ & Not Null, Unique & ~ \\ 
+        IsInCampus & 是否在校園內 & boolean & ~ & Not Null & \{true, false\} \\ 
+    \bottomrule
+    \end{tabular}}
+     \caption{資料表 LOCATION 的欄位資訊}
+\end{table}
+
+% RETURNS_OR_CLAIMS
+\begin{table}[H]
+    \centering
+    \resizebox{\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\
+    \midrule
+        ItemID & 物品編號 & char(10) & PK, FK: ITEM(ItemID) & Not Null & ~ \\ 
+        UserID & 使用者編號 & char(10) & PK, FK: USER(UserID) & Not Null & ~ \\ 
+        RCTime & 歸還或認領時間 & timestamp & PK & Not Null & ~ \\ 
+        Status & 歸還或認領狀態 & char(1) & ~ & Not Null & \{P: 進行中, S: 完成, C: 取消, F: 失敗\} \\
+    \midrule
+        Referential triggers & ~ & On Delete & On Update & ~ \\
+    \midrule
+        \multicolumn{2}{l}{ItemID: ITEM(ItemID)} & Cascade & Cascade \\  
+        \multicolumn{2}{l}{UserID: USER(UserID)} & Cascade & Cascade \\ 
+    \bottomrule
+    \end{tabular}}
+    \caption{資料表 RETURNS\_OR\_CLAIMS 的欄位資訊}
+\end{table}
+
+% NOTIFIES
+\begin{table}[H]
+    \centering
+    \resizebox{.9\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\
+    \midrule
+        ItemID & 物品編號 & char(10) & PK, FK: ITEM(ItemID) & Not Null & ~ \\ 
+        UserID & 使用者編號 & char(10) & PK, FK: USER(UserID) & Not Null & ~ \\ 
+        NotifyTime & 通知時間 & timestamp & PK & Not Null & ~ \\ 
+    \midrule
+        Referential triggers & ~ & On Delete & On Update & ~ \\
+    \midrule
+        \multicolumn{2}{l}{ItemID: ITEM(ItemID)} & Cascade & Cascade \\  
+        \multicolumn{2}{l}{UserID: USER(UserID)} & Cascade & Cascade \\ 
+    \bottomrule
+    \end{tabular}}
+    \caption{資料表 NOTIFIES 的欄位資訊}
+\end{table}
+
+% REWARD
+\begin{table}[H]
+    \centering
+    \resizebox{\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\
+    \midrule
+        ItemID & 物品編號 & char(10) & PK, FK: ITEM(ItemID) & Not Null & ~ \\ 
+        RewardName & 懸賞物品名稱 & varchar(15) & PK & Not Null & ~ \\ 
+        Amount & 數量 & int & ~ & Not Null & ~ \\ 
+    \midrule
+        Referential triggers & ~ & On Delete & On Update & ~ \\
+    \midrule
+        \multicolumn{2}{l}{ItemID: ITEM(ItemID)} & Cascade & Cascade \\  
+    \bottomrule
+    \end{tabular}}
+    \caption{資料表 REWARD 的欄位資訊}
+\end{table}
+
+% CATEGORY
+\begin{table}[H]
+    \centering
+    \resizebox{.8\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\
+    \midrule
+        CategoryID & 類別編號 & char(10) & PK & Not Null, Unique & ~ \\ 
+        CategoryName & 類別名稱 & varchar(10) & ~ & Not Null, Unique & ~ \\ 
+    \bottomrule
+    \end{tabular}}
+    \caption{資料表 CATEGORY 的欄位資訊}
+\end{table}
+
+% BELONGS
+\begin{table}[H]
+    \centering
+    \resizebox{\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\
+    \midrule
+        ItemID & 物品編號 & char(10) & PK, FK: ITEM(ItemID) & Not Null & ~ \\ 
+        CategoryID & 類別編號 & char(10) & PK, FK: CATEGORY(CategoryID) & Not Null & ~ \\
+    \midrule
+        Referential triggers & ~ & On Delete & On Update & ~ \\
+    \midrule
+        \multicolumn{2}{l}{ItemID: ITEM(ItemID)} & Cascade & Cascade \\  
+        \multicolumn{2}{l}{CategoryID: CATEGORY(CategoryID)} & Cascade & Cascade \\ 
+    \bottomrule
+    \end{tabular}}
+    \caption{資料表 BELONGS 的欄位資訊}
+\end{table}
+
+% POSTS
+\begin{table}[H]
+    \centering
+    \resizebox{\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\
+    \midrule
+        MemberID & 會員編號 & char(10) & PK, FK: USER(UserID) & Not Null & ~ \\ 
+        ItemID & 物品編號 & char(10) & PK, FK: ITEM(ItemID) & Not Null, Unique & ~ \\ 
+        PostTime & 發文時間 & timestamp & ~ & Not Null & ~ \\ 
+    \midrule
+        Referential triggers & ~ & On Delete & On Update & ~ \\
+    \midrule
+        \multicolumn{2}{l}{MemberID: USER(UserID)} & Cascade & Cascade \\  
+        \multicolumn{2}{l}{ItemID: ITEM(ItemID)} & Cascade & Cascade \\  
+    \bottomrule
+    \end{tabular}}
+    \caption{資料表 POSTS 的欄位資訊}
+\end{table}
+
+% COMMENTS
+\begin{table}[H]
+    \centering
+    \resizebox{\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\
+    \midrule
+        MemberID & 會員編號 & char(10) & PK, FK: USER(UserID) & Not Null & ~ \\ 
+        ItemID & 物品編號 & char(10) & PK, FK: ITEM(ItemID) & Not Null & ~ \\ 
+        CmTime & 留言時間 & timestamp & PK & Not Null & ~ \\ 
+        CmContent & 留言內容 & text & ~ & Not Null & ~ \\
+    \midrule
+        Referential triggers & ~ & On Delete & On Update & ~ \\
+    \midrule
+        \multicolumn{2}{l}{MemberID: USER(UserID)} & Cascade & Cascade \\  
+        \multicolumn{2}{l}{ItemID: ITEM(ItemID)} & Cascade & Cascade \\  
+    \bottomrule
+    \end{tabular}}
+    \caption{資料表 COMMENTS 的欄位資訊}
+\end{table}
+
+% USER
+\begin{table}[H]
+    \centering
+    \resizebox{.9\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\
+    \midrule
+        UserID & 使用者編號 & char(10) & PK & Not Null, Unique & ~ \\ 
+        UserName & 使用者姓名 & varchar(20) & ~ & ~ & ~ \\ 
+        Email & 電子郵件 & text & ~ & Not Null & ~ \\ 
+        PhoneNumber & 電話號碼 & varchar(10) & ~ & Not Null & ~ \\
+    \bottomrule
+    \end{tabular}}
+    \caption{資料表 USER 的欄位資訊}
+\end{table}
+
+% MEMBER
+\begin{table}[H]
+    \centering
+    \resizebox{\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\
+    \midrule
+        MemberID & 會員編號 & char(10) & PK, FK: USER(UserID) & Not Null, Unique & ~ \\ 
+        AccountName & 帳號名稱 & varchar(30) & ~ & Not Null & ~ \\ 
+        Password & 密碼 & varchar(20) & ~ & Not Null & ~ \\ 
+    \midrule
+        Referential triggers & ~ & On Delete & On Update & ~ \\
+    \midrule
+        \multicolumn{2}{l}{MemberID: USER(UserID)} & Cascade & Cascade \\  
+    \bottomrule
+    \end{tabular}}
+    \caption{資料表 MEMBER 的欄位資訊}
+\end{table}
+
+% MESSAGE
+\begin{table}[H]
+    \centering
+    \resizebox{\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\
+    \midrule
+        SenderID & 傳送者編號 & char(10) & PK, FK: USER(UserID) & Not Null & ~ \\ 
+        ReceiverID & 接收者編號 & char(10) & PK, FK: USER(UserID) & Not Null & ~ \\ 
+        MgTime & 私訊時間 & timestamp & PK & Not Null & ~ \\ 
+        MgContent & 私訊內容 & int & ~ & Not Null & ~ \\
+    \midrule
+        Referential triggers & ~ & On Delete & On Update & ~ \\
+    \midrule
+        \multicolumn{2}{l}{SenderID: USER(UserID)} & Cascade & Cascade \\ 
+        \multicolumn{2}{l}{ReceiverID: USER(UserID)} & Cascade & Cascade \\ 
+    \bottomrule
+    \end{tabular}}
+    \caption{資料表 MESSAGE 的欄位資訊}
+\end{table}
+
+% FEEDBACK
+\begin{table}[H]
+    \centering
+    \resizebox{\columnwidth}{!}{
+    \begin{tabular}{llllll}
+    \toprule
+        Column Name & Meaning & Data Type & Key & Constraint & Domain \\
+    \midrule
+        MemberID & 會員編號 & char(10) & PK, FK: USER(UserID) & Not Null & ~ \\ 
+        FBTime & 回饋時間 & timestamp & PK & Not Null & ~ \\ 
+        FBContent & 回饋內容 & text & ~ & Not Null & ~ \\ 
+    \midrule
+        Referential triggers & ~ & On Delete & On Update & ~ \\
+    \midrule
+        \multicolumn{2}{l}{MemberID: USER(UserID)} & Cascade & Cascade \\ 
+    \bottomrule
+    \end{tabular}}
+    \caption{資料表 FEEDBACK 的欄位資訊}
+    \label{tab:fb}
+\end{table}
+
+
+
+
+
+
+\subsection{正規化分析}
+
+當設計關聯式資料庫時，我們可以檢視資料庫綱目（database schema）是否滿足正規化（normalization）條件，因此我們將依序從第一正規式（1NF）到第四正規式（4NF） 來說明「NTULOST」的關聯是如何滿足這些規則。
+
+在 1NF 方面，如果每個關聯的屬性都是 simple 且 single-valued，換句話說，在關聯中沒有任何一個屬性是 composite 或 multi-valued，則滿足 1NF。從我們的Schema中，可以看到所有資料都是已經被簡化成simple 且 single-valued，確保其滿足1NF。
+
+在 2NF 方面，如果關聯中的所有非鍵屬性（non-prime attribute）都完全功能相依（fully functional dependency）於任一候選鍵（candidate key），也就是沒有出現部分功能相依性（partial functional dependency），且此關聯滿足 1NF，則滿足 2NF。從我們的Schema中，可以看到我們將所有可能會違反2NF的資料都獨立成新的Relations，確保其滿足2NF。
+
+在 3NF 方面，如果一個關聯中的非鍵屬性都沒有遞移相依（transitively dependency）於主鍵，則滿足 3NF。從我們的Schema中，可以看到我們將所有可能會違反3NF的資料都獨立成新的Relations，確保其滿足3NF。
+
+在 BCNF 方面，要求關聯中的每一個功能相依的箭頭左方都要是超級鍵（superkey），也就是要確保 X → Y 的 X 一定是超級鍵。我們的 schema 也符合 BCNF。 
+
+最後是 4NF，由於「NTULOST」的所有關聯都不存在多值相依（multi-valued dependency），因此滿足 4NF 的條件。 
+
+
+\end{document}
+
+
