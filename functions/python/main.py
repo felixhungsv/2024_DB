@@ -9,7 +9,7 @@ import sys
 import time
 import psycopg2
 
-import signup
+import sign
 
 # 初始化 colorama
 init()
@@ -33,7 +33,3 @@ def query(query, param):
     result = con.execute(query, param).fetchall()
     column_names = [desc[0] for desc in con.description]
     return column_names, result
-
-def is_valid_code(input_str):
-    pattern = r"^[A-Za-z]\d{8}$"
-    return bool(re.match(pattern, input_str))
