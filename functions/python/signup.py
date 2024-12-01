@@ -1,75 +1,56 @@
-import numpy as np
-import pandas as pd
-import duckdb
-import psycopg2
-import matplotlib.pyplot as plt
+def is_valid_code(input_str):
+    pattern = r"^[A-Za-z]\d{8}$"
+    return bool(re.match(pattern, input_str))
 
-with open('db_password.txt', 'r') as file:
-    db_password = file.read().strip()
+def is_valid_password(password):
+    pattern = r"^[A-Za-z0-9]{8,20}$"
+    return bool(re.match(pattern, password))
 
-psql_conn = psycopg2.connect("port = '5433' dbname = 'OnlineLearning2024' user = 'postgres' host = 'localhost' password = " + db_password)
+def delete_terminal_content(lines):
+    sys.stdout.write(Cursor.UP(lines)) 
+    sys.stdout.write("\033[J")   
+    sys.stdout.flush()
 
-table_names = ['Subscriptions', 'StateChanges', 'UserMissions', 'Answers']
-con = duckdb.connect()
+def sign_up():
+    while True:
+        UserID = input("請輸入台大證件號碼：")
 
-for table_name in table_names:
-    query_str = "SELECT * FROM " + table_name
-    df = pd.read_sql_query(query_str, psql_conn)
-    con.register(table_name, df)
-
-psql_conn.close()
-
-def query(query):
-    result = con.execute(query).fetchall()
-    column_names = [desc[0] for desc in con.description]
-    return column_names, result
-
-query_str = '''
-SELECT AnswerID, UserID, QuestionID, MissionID, 
-	IsCorrect, CostTime, CreatedAT, EndedAt
-FROM answers
-LEFT JOIN 
-(
-	SELECT endedat, subscriberid
-	FROM subscriptions su
-) ON userid=subscriberid
-WHERE createdat>=DATE'2021-5-1' and endedat<createdat
-'''
-columns, data = query(query_str)
-
-for i in range(5):
-    print(f"{data[i]}")
-
-query_str = '''
-SELECT UserID, Avg(CostTime) mean_CostTime, Avg(IsCorrect) mean_CorrectRate
-FROM
-(
-	SELECT AnswerID, UserID, QuestionID, MissionID, 
-		IsCorrect, CostTime, CreatedAT, EndedAt
-	FROM answers
-	LEFT JOIN 
-	(
-		SELECT endedat, subscriberid
-		FROM subscriptions su
-	) ON userid=subscriberid
-	WHERE createdat>=DATE'2021-5-1' and endedat<createdat
-)
-GROUP BY UserID
-'''
-columns, data = query(query_str)
-
-df = pd.DataFrame(data, columns=columns)
-filtered_df = df[df['mean_CostTime'] <= 50]
-median_CostTime = filtered_df['mean_CostTime'].median()
-median_CorrectRate = filtered_df['mean_CorrectRate'].median()
-
-plt.figure(figsize=(10, 6))
-plt.scatter(filtered_df['mean_CostTime'], filtered_df['mean_CorrectRate'], color='green', alpha=0.35)
-plt.axvline(x=median_CostTime, color='orange', linestyle='--', label=f'Median Cost Time: {median_CostTime:.2f}s')
-plt.axhline(y=median_CorrectRate, color='blue', linestyle='--', label=f'Median Correct Rate: {median_CorrectRate:.2%}')
-
-plt.title('Scatter Plot of Avg Cost Time vs. Correct Rate')
-plt.xlabel('Average Cost Time (seconds)')
-plt.ylabel('Correct Rate')
-plt.legend()
-plt.show()
+        if is_valid_code(UserID):
+            query_str = '''
+            SELECT UserID
+            FROM USER
+            WHERE UserID=%s
+            '''
+            columns, data = query(query_str, (UserID,))
+            if data:
+                print("此帳號已註冊！\n")
+                print("前往登入頁面？\n")
+            else:
+                UserName = input("請輸入姓名：")
+                Email = input("請輸入電子郵件：")
+                PhoneNumber = input("請輸入電話號碼：")
+                Password1 = input("請設定密碼（8-20碼，僅由英文字母與數字組成）：")
+                while is_valid_password(Password1) == 0:
+                    print("格式錯誤！\n")
+                    time.sleep(2)
+                    delete_terminal_content(2)
+                    Password1 = input("請設定密碼（8-20碼，僅由英文字母與數字組成）：")
+                Password2 = input("請再次輸入密碼：")
+                while Password1 != Password2:
+                    print("前後密碼不一致！\n")
+                    time.sleep(2)
+                    delete_terminal_content(2)
+                    Password2 = input("請重新輸入：")
+                query_str = '''
+                INSERT INTO USER (UserID, UserName, Email, PhoneNumber) 
+                VALUES (%s, %s, %s, %s)
+                INSERT INTO MEMBER (MemberID, AccountName, Password) 
+                VALUES (%s, %s, %s)
+                '''
+                columns, data = query(query_str, (UserID, UserName, Email, PhoneNumber, UserID, UserName, Password1))
+                print("註冊成功！\n")
+                break
+        else:
+            print("格式錯誤！\n")
+        time.sleep(2)
+        delete_terminal_content(2)
