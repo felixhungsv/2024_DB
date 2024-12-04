@@ -34,6 +34,8 @@ def feedback():
     SELECT f.userid, u.username, f.fbtime, f.fbcontent
     from feedback as f
     join USERS as u on f.userid = u.userid
+    order by fbtime desc
+    limit 10
     ''')
     return utils.pd.DataFrame(data, columns=columns).sort_values("fbtime")
 
@@ -44,6 +46,8 @@ def comment(itemID):
     join USERS as u on c.memberid = u.userid
     join ITEM as i on c.itemid = i.itemid
     WHERE i.itemid = '{itemID}'
+    order bt cmtime desc
+    limit 10
     ''')
     # 將結果轉換為 DataFrame
     return utils.pd.DataFrame(data, columns=columns).sort_values("cmtime")
