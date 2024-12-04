@@ -67,9 +67,9 @@ def view_user_profile(user_id): # 檢視個人主頁
     ''')
     return utils.pd.DataFrame(data, columns=columns)
 
-user_id = 'UB07050678'  # 假設用戶的 ID 是 UB07050678
-profile_data = view_user_profile(user_id)
-print(profile_data)
+# user_id = 'UB07050678'  # 假設用戶的 ID 是 UB07050678
+# profile_data = view_user_profile(user_id)
+# print(profile_data)
 
 def delete_post(role, member_id=None, item_id=None): # 刪除貼文
     
@@ -100,11 +100,11 @@ def delete_post(role, member_id=None, item_id=None): # 刪除貼文
     else:
         raise ValueError("Invalid role provided.")
     
-role = 'Manager'
-item_id = 'IT00000001'
+# role = 'Manager'
+# item_id = 'IT00000001'
 
-result = delete_post(role, item_id=item_id)
-print(result)
+# result = delete_post(role, item_id=item_id)
+# print(result)
 
 def delete_comment(role, member_id=None, item_id=None, commenter_id=None, comment_time=None): # 刪除留言
     
@@ -127,13 +127,13 @@ def delete_comment(role, member_id=None, item_id=None, commenter_id=None, commen
     else:
         raise PermissionError("Role does not have permission to delete comments.")
 
-role = 'Member'
-member_id = 'UB09340643'
-item_id = 'IT00000823'
-comment_content = '我弄丟了它，請問可以提供更詳細的描述嗎？0'
+# role = 'Member'
+# member_id = 'UB09340643'
+# item_id = 'IT00000823'
+# comment_content = '我弄丟了它，請問可以提供更詳細的描述嗎？0'
 
-result = delete_comment(role, member_id=member_id, item_id=item_id, comment_content=comment_content)
-print(result)
+# result = delete_comment(role, member_id=member_id, item_id=item_id, comment_content=comment_content)
+# print(result)
 
 def delete_message(role, sender_id=None, receiver_id=None, message_content=None): # 刪除私訊
     
@@ -157,12 +157,12 @@ def delete_message(role, sender_id=None, receiver_id=None, message_content=None)
     else:
         raise PermissionError("Role does not have permission to delete messages.")
     
-role = 'Member'
-sender_id = 'UD01195700'
-message_content = '我記得放在椅子上，請問可以再提供一些細節嗎？'
+# role = 'Member'
+# sender_id = 'UD01195700'
+# message_content = '我記得放在椅子上，請問可以再提供一些細節嗎？'
 
-result = delete_message(role, sender_id=sender_id, message_content=message_content)
-print(result)
+# result = delete_message(role, sender_id=sender_id, message_content=message_content)
+# print(result)
 # 輸出：Message at 我記得放在椅子上，請問可以再提供一些細節嗎？ deleted successfully by Member.
  
 

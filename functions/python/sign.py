@@ -116,6 +116,7 @@ def sign_in():
         account_name_index = columns.index('AccountName')
         account_name = data[0][account_name_index]
         print(f"歡迎！{account_name}！")
+        return UserID
     else:
         print("查無此帳號！")
         utils.delete_terminal_content(1.5, 2)
@@ -190,7 +191,7 @@ def anonymous_sign_in():
             UserID = check_phonenumber_existence(PhoneNumber)[0]
             if UserID[:2] == "US":
                 print("提醒您，現在是以匿名登入！")
-                break
+                return UserID
             else:
                 # 此處需連接登入頁面func
                 print("此電話號碼不適用匿名登入，請前往會員登入頁面！")
