@@ -37,9 +37,9 @@ cursor = psql_conn.cursor()
 #     column_names = [desc[0] for desc in con.description]
 #     return column_names, result
 
-def query(query, param):
+def query(query, param=None):
     cursor.execute(query, param)
-    if query.strip().lower().startswith("select"):
+    if query.strip().lower().startswith("select") or query.strip().lower().startswith("with"):
         result = cursor.fetchall()
         column_names = [desc[0] for desc in cursor.description]
         return column_names, result
@@ -55,3 +55,5 @@ def delete_terminal_content(sleep_time, lines):
     sys.stdout.write(Cursor.UP(lines)) 
     sys.stdout.write("\033[1G\033[J")   
     sys.stdout.flush()
+
+role = ""

@@ -16,7 +16,7 @@ def handle_user_id_input():
     while True:
         user_id = input("請輸入台大證件號碼：")
         if is_valid_code(user_id):
-            return user_id
+            return user_id.upper()
         else:
             print("格式錯誤！")
             utils.delete_terminal_content(1.5, 2)
@@ -66,7 +66,7 @@ def prompt_phonenumber():
             return PhoneNumber
 
 def sign_up():
-    utils.print_bold("註冊\n")
+    utils.print_bold("註冊")
     UserID = "U" + handle_user_id_input()
     check = check_user_existence(UserID)
     if check:
@@ -92,7 +92,7 @@ def sign_up():
         print("註冊成功！")
 
 def sign_in():
-    utils.print_bold("登入\n")
+    utils.print_bold("登入")
     UserID = "U" + handle_user_id_input()
     check = check_user_existence(UserID)
     if check:
@@ -122,7 +122,7 @@ def sign_in():
         utils.delete_terminal_content(1.5, 2)
 
 def change_password():
-    utils.print_bold("更改密碼\n")
+    utils.print_bold("更改密碼")
     UserID = "U" + handle_user_id_input()
     check = check_user_existence(UserID)
     if check:
@@ -145,7 +145,7 @@ def change_password():
             break
         Password = prompt_password_confirmation()
         query_str = '''
-        UPDATE MEMBER
+        UPDATE members
         SET Password=%s
         WHERE MemberID=%s;
         '''
@@ -156,10 +156,10 @@ def change_password():
         utils.delete_terminal_content(1.5, 2)
 
 def anonymous_sign_up():
-    utils.print_bold("訪客註冊\n")
+    utils.print_bold("訪客註冊")
     PhoneNumber = prompt_phonenumber()
     query_str = '''
-    WITH user_with_numbers AS (
+    WITH users_with_numbers AS (
         SELECT UserID,
             CAST(SUBSTRING(UserID FROM 3) AS INTEGER) AS number_part
         FROM users
@@ -168,17 +168,17 @@ def anonymous_sign_up():
     SELECT 'US' || LPAD((MAX(number_part) + 1)::TEXT, 8, '0') AS next_UserID
     FROM users_with_numbers
     '''
-    columns, data = utils.query(query_str, ())
+    columns, data = utils.query(query_str)
     UserID = data[0]
     query_str = '''
-    INSERT INTO USER (UserID, PhoneNumber) 
+    INSERT INTO users (UserID, PhoneNumber) 
     VALUES (%s, %s)
     '''
     utils.query(query_str, (UserID, PhoneNumber))
     print("匿名註冊成功！")
 
 def anonymous_sign_in():
-    utils.print_bold("訪客登入\n")
+    utils.print_bold("訪客登入")
     while True:
         PhoneNumber = input("請輸入電話號碼：")
         if is_valid_phonenumber(PhoneNumber) == 0:
