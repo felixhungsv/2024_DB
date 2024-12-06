@@ -71,6 +71,18 @@ def view_posts_by_posttime(page=1): # 檢視貼文排序依照貼文發布時間
 # profile_data = view_user_profile(user_id)
 # print(profile_data)
 
+def type_of_posts():
+    print("請問要以哪種排序檢視？")
+    print("1: 依照時間序  2: 依照留言數")
+    type = input("請輸入數字：")
+    if type == "1":
+        view_posts_by_posttime(utils.page)
+    elif type == "2":
+        view_posts_by_comments(utils.page)
+    else:
+        print("輸入錯誤！請重新再試！")
+        utils.delete_terminal_content(1.5,2)
+
 def delete_post(role, member_id=None, item_id=None): # 刪除貼文
     
     if role == 'Member':

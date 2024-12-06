@@ -20,7 +20,6 @@ def post():
                 item_location = input("您遺失的大致地點（請填數字，可不填）：")
                 if item_location:
                     item_location_name = utils.locations[int(item_location)-1]
-                item_description = input("您對物品的詳細描述：")
                 item_image = input("物品照片的網址（可不填）：")
                 if item_image == "":
                     item_image = None
@@ -46,7 +45,7 @@ def post():
                 INSERT INTO item(ItemID, Description, imageURL)
                 VALUES (%s, %s, %s);
                 '''
-                utils.query(query_str, (ItemID, item_description, item_image))
+                utils.query(query_str, (ItemID, item_name, item_image))
 
                 # insert lost_item
                 query_str = '''
@@ -120,7 +119,6 @@ def post():
                 item_location_name = utils.locations[int(item_location)-1]
                 item_store = input("您將物品存放在哪個地點（請填數字）：")
                 item_store_name = utils.locations[int(item_store)-1]
-                item_description = input("您對物品的詳細描述：")
                 item_image = input("物品照片的網址（可不填）：")
                 if item_image == "\n":
                     item_image = None
@@ -144,7 +142,7 @@ def post():
                 INSERT INTO item(ItemID, Description, imageURL)
                 VALUES (%s, %s, %s);
                 '''
-                utils.query(query_str, (ItemID, item_description, item_image))
+                utils.query(query_str, (ItemID, item_name, item_image))
 
                 # insert found_item
                 query_str = '''

@@ -103,7 +103,7 @@ def sign_in():
                 utils.delete_terminal_content(1.5, 2)
                 continue
             query_str = '''
-            SELECT MemberID AccountName
+            SELECT MemberID, AccountName
             FROM members
             WHERE MemberID=%s and Password=%s
             '''
@@ -113,7 +113,8 @@ def sign_in():
                 utils.delete_terminal_content(1.5, 2)
                 continue
             break
-        account_name_index = columns.index('AccountName')
+        print(columns,data)
+        account_name_index = columns.index('accountname')
         account_name = data[0][account_name_index]
         print(f"歡迎！{account_name}！")
         return UserID, account_name
@@ -133,7 +134,7 @@ def change_password():
                 utils.delete_terminal_content(1.5, 2)
                 continue
             query_str = '''
-            SELECT MemberID AccountName
+            SELECT MemberID, AccountName
             FROM members
             WHERE MemberID=%s and Password=%s
             '''
@@ -188,7 +189,7 @@ def anonymous_sign_in():
             print("查無此電話號碼！")
             utils.delete_terminal_content(1.5, 2)
         else:
-            UserID = check_phonenumber_existence(PhoneNumber)[0]
+            UserID = check_phonenumber_existence(PhoneNumber)[0][0]
             if UserID[:2] == "US":
                 print("提醒您，現在是以匿名登入！")
                 return UserID, "匿名使用者"
@@ -196,3 +197,9 @@ def anonymous_sign_in():
                 # 此處需連接登入頁面func
                 print("此電話號碼不適用匿名登入，請前往會員登入頁面！")
                 utils.delete_terminal_content(1.5, 2)
+
+def log_out():
+    utils.userid = ""
+    utils.username = ""
+    utils.role = ""
+    utils.print_bold("Bye!")
