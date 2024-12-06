@@ -1,6 +1,7 @@
 import utils
 
 def message(user):
+    utils.print_bold("以下為您的最近聯絡人的名單！")
     columns, data = utils.query(f'''
     SELECT 
         CASE 
@@ -18,7 +19,9 @@ def message(user):
     ''') 
     return utils.pd.DataFrame(data, columns=columns)
 
-def message_people(user, other_user):
+def message_people(user):
+    utils.print_bold("以下為您的聊天記錄！")
+    other_user = input("請輸入您想查看的聯絡人對話紀錄：")
     columns, data = utils.query(f'''
     SELECT m.senderid, u_s.username as senderName, m.receiverid, u_r.username as receiverName, m.mgtime, mgcontent
     from MESSAGE as m
