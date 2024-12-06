@@ -2,7 +2,7 @@ import utils
 
 def view_posts_by_comments(page=1): # 檢視貼文排序依照貼文的留言數
     if page < 1:
-        raise ValueError("Page number must be 1 or greater.")
+        raise ValueError("頁碼必須為 1 或更大.")
     
     offset = (page - 1) * 10 # 每一頁有10個貼文
 
@@ -29,7 +29,7 @@ def view_posts_by_comments(page=1): # 檢視貼文排序依照貼文的留言數
 
 def view_posts_by_posttime(page=1): # 檢視貼文排序依照貼文發布時間
     if page < 1:
-        raise ValueError("Page number must be 1 or greater.")
+        raise ValueError("頁碼必須為 1 或更大")
     
     offset = (page - 1) * 10
 
@@ -54,18 +54,18 @@ def view_posts_by_posttime(page=1): # 檢視貼文排序依照貼文發布時間
 
     return utils.pd.DataFrame(data, columns=columns)
 
-def view_user_profile(user_id): # 檢視個人主頁
+#def view_user_profile(user_id): # 檢視個人主頁
 
-    columns, data = utils.query(f'''
-    SELECT 
-        u.userid,
-        u.username,
-        u.email,
-        u.phonenumber,
-    FROM USERS AS u
-    WHERE u.userid = '{user_id}'
-    ''')
-    return utils.pd.DataFrame(data, columns=columns)
+    #columns, data = utils.query(f'''
+    #SELECT 
+        #u.userid,
+        #u.username,
+        #u.email,
+        #u.phonenumber,
+    #FROM USERS AS u
+    #WHERE u.userid = '{user_id}'
+    #''')
+    #return utils.pd.DataFrame(data, columns=columns)
 
 # user_id = 'UB07050678'  # 假設用戶的 ID 是 UB07050678
 # profile_data = view_user_profile(user_id)
@@ -79,7 +79,7 @@ def delete_post(role, member_id=None, item_id=None): # 刪除貼文
         DELETE FROM POSTS
         WHERE UserID = '{member_id}' AND ItemID = '{item_id}'
         ''')
-        return f"Post with ItemID {item_id} deleted successfully by Member."
+        return f"temID {item_id} 的貼文已被成功刪除。"
     
     elif role == 'User':
         # 匿名用戶：只能刪除自己的貼文
@@ -87,7 +87,7 @@ def delete_post(role, member_id=None, item_id=None): # 刪除貼文
         DELETE FROM POSTS
         WHERE UserID = '{user_id}' AND ItemID = '{item_id}'
         ''')
-        return f"Post with ItemID {item_id} deleted successfully by User."
+        return f"ItemID {item_id} 的貼文已被成功刪除。"
     
     elif role == 'Manager':
         # 業務經理者：可以刪除所有人的貼文
@@ -95,10 +95,10 @@ def delete_post(role, member_id=None, item_id=None): # 刪除貼文
         DELETE FROM POSTS
         WHERE ItemID = '{item_id}'
         ''')
-        return f"Post with ItemID {item_id} deleted successfully by Manager."
+        return f"ItemID {item_id} 的貼文已被成功刪除。"
     
     else:
-        raise ValueError("Invalid role provided.")
+        raise ValueError("刪除貼文無效.")
     
 # role = 'Manager'
 # item_id = 'IT00000001'
@@ -114,7 +114,7 @@ def delete_comment(role, member_id=None, item_id=None, commenter_id=None, commen
         DELETE FROM COMMENTS
         WHERE MemberID = '{member_id}' AND ItemID = '{item_id}' AND CmContent = '{comment_content}'
         ''')
-        return f"Comment on ItemID {item_id} at {comment_time} deleted successfully by Member."
+        return f"已成功刪除對 ItemID {item_id} 的評論。"
     
     elif role == 'Manager':
         # 業務經理者：可以刪除所有人的留言
@@ -122,10 +122,10 @@ def delete_comment(role, member_id=None, item_id=None, commenter_id=None, commen
         DELETE FROM COMMENTS
         WHERE ItemID = '{item_id}' AND CmContent = '{comment_content}'
         ''')
-        return f"Comment on ItemID {item_id} at {comment_time} deleted successfully by Manager."
+        return f"已成功刪除對 ItemID {item_id} 的評論。"
     
     else:
-        raise PermissionError("Role does not have permission to delete comments.")
+        raise PermissionError("您沒有刪除評論的權限。")
 
 # role = 'Member'
 # member_id = 'UB09340643'
@@ -144,7 +144,7 @@ def delete_message(role, sender_id=None, receiver_id=None, message_content=None)
         WHERE (SenderID = '{sender_id}' OR ReceiverID = '{receiver_id}')
           AND MgContent = '{message_content}'
         ''')
-        return f"Message at {message_content} deleted successfully by Member."
+        return f"已成功刪除 {message_content}。"
     
     elif role == 'Manager':
         # 業務經理者：可以刪除所有私訊
@@ -152,7 +152,7 @@ def delete_message(role, sender_id=None, receiver_id=None, message_content=None)
         DELETE FROM MESSAGES
         WHERE MgContent = '{message_content}'
         ''')
-        return f"Message at {message_content} deleted successfully by Manager."
+        return f"已成功刪除 {message_content}。"
     
     else:
         raise PermissionError("Role does not have permission to delete messages.")
