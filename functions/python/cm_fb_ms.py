@@ -33,6 +33,7 @@ def message_people(user):
     return utils.pd.DataFrame(data, columns=columns)
 
 def feedback():
+    print("以下為最新的十則回饋！")
     columns, data = utils.query('''
     SELECT f.userid, u.username, f.fbtime, f.fbcontent
     from feedback as f
@@ -43,6 +44,7 @@ def feedback():
     return utils.pd.DataFrame(data, columns=columns).sort_values("fbtime")
 
 def comment(itemID):
+    print("以下為最新的十則留言！")
     columns, data = utils.query(f'''
     SELECT c.memberid, u.username, c.itemid, i.description, c.cmtime, c.cmcontent
     from COMMENTS as c
