@@ -1,4 +1,5 @@
 import utils
+import comment
 
 def view_posts_by_comments(page=1): # 檢視貼文排序依照貼文的留言數
     if page < 1:
@@ -82,6 +83,19 @@ def type_of_posts():
     else:
         print("輸入錯誤！請重新再試！")
         utils.delete_terminal_content(1.5,2)
+    while True:
+        print("請問是否要查看留言或發出留言？")
+        print("1: 查看留言  2: 發出留言 3: 返回")   
+        type = input("請輸入數字：")
+        if type == "1":
+            print("請輸入要查看的物品ID：")
+            itemid = input("ItemID: ")
+            print(comment.comment_view(itemid))
+        elif type == "2":
+            comment.post_comment()
+        elif type == "3":
+            break
+    
 
 def delete_post(role, member_id=None, item_id=None): # 刪除貼文
     

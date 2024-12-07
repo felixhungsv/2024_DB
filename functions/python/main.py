@@ -3,7 +3,9 @@ import sign
 import view
 import search
 import post
-import cm_fb_ms
+import feedback
+import message
+import stat
 
 # 註冊/登入
 sign_features = {
@@ -47,22 +49,22 @@ member_features = {
     2: ("發文", post.post),
     3: ("搜尋", search.search),
     4: ("檢視貼文", view.type_of_posts),
-    5: ("私訊", cm_fb_ms.asdf),
-    6: ("回饋", cm_fb_ms.post_feedback),
+    5: ("私訊", message.message_view),
+    6: ("回饋", feedback.post_feedback),
     7: ("登出", sign.log_out)
 }
 anonym_features = {
     1: ("發文", post.post),
     2: ("搜尋", search.search),
     3: ("檢視貼文", view.type_of_posts),
-    4: ("回饋", cm_fb_ms.asdf),
+    4: ("回饋", feedback.post_feedback),
     5: ("登出", sign.log_out)
 }
 manager_features = {
     1: ("搜尋", search.search),
     2: ("檢視貼文", view.type_of_posts),
-    3: ("檢視回饋", cm_fb_ms.asdf),
-    4: ("統計數據", cm_fb_ms.asdf),
+    3: ("檢視回饋", feedback.feedback_view),
+    4: ("統計數據", stat.run_analysis),
     5: ("登出", sign.log_out)
 }
 
