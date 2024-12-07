@@ -22,7 +22,7 @@ def run_analysis():
         elif selected_option == 5:
             return popular_time_analysis()
         else:
-            print("請輸入正確的數字！")
+            print("輸入錯誤！請輸入正確的數字！")
             selected_option = int(input("請輸入數字："))
             
 
@@ -40,6 +40,7 @@ def top_locations_analysis():
     LEFT JOIN lost_item LST ON LO.itemid = LST.itemid
     GROUP BY L.locationdescription
     ORDER BY (COUNT(DISTINCT F.itemid) + COUNT(DISTINCT LST.itemid)) DESC
+    limit 10;
     '''
     columns, data = utils.query(query)
     return columns, data
@@ -82,15 +83,13 @@ def reward_effectiveness_analysis():
     SELECT 
         R.rewardname,
         R.amount,
-        COUNT(DISTINCT F.itemid) AS found_with_reward,
-        COUNT(DISTINCT LST.itemid) AS lost_with_reward,
-        (COUNT(DISTINCT F.itemid)::FLOAT / COUNT(DISTINCT LST.itemid)) AS success_rate
+        COUNT(DISTINCT LST.itemid) AS number_of_lost_with_reward,
     FROM 
         reward R
-    LEFT JOIN found_item F ON R.itemid = F.itemid
     LEFT JOIN lost_item LST ON R.itemid = LST.itemid
     GROUP BY R.rewardname, R.amount
-    ORDER BY success_rate DESC, R.amount DESC;
+    ORDER BY number_of_lost_with_reward DESC
+    limit 10;
     '''
     columns, data = utils.query(query)
     return columns, data
@@ -98,15 +97,31 @@ def reward_effectiveness_analysis():
 def popular_time_analysis():
     query = '''
     SELECT 
-        EXTRACT(HOUR FROM losttime) AS lost_hour,
-        COUNT(DISTINCT L.itemid) AS lost_count,
-        EXTRACT(HOUR FROM foundtime) AS found_hour,
-        COUNT(DISTINCT F.itemid) AS found_count
-    FROM 
-        lost_item L
-    FULL OUTER JOIN found_item F ON L.itemid = F.itemid
-    GROUP BY lost_hour, found_hour
-    ORDER BY lost_hour, found_hour;
+        hour AS time_hour,
+        SUM(lost_count) AS total_lost_count,
+        SUM(found_count) AS total_found_count,
+        SUM(lost_count + found_count) AS total_items_count
+    FROM (
+        SELECT 
+            EXTRACT(HOUR FROM losttime) AS hour,
+            COUNT(DISTINCT L.itemid) AS lost_count,
+            0 AS found_count
+        FROM 
+            lost_item L
+        GROUP BY hour
+
+        UNION ALL
+
+        SELECT 
+            EXTRACT(HOUR FROM foundtime) AS hour,
+            0 AS lost_count,
+            COUNT(DISTINCT F.itemid) AS found_count
+        FROM 
+            found_item F
+        GROUP BY hour
+    ) AS combined_data
+    GROUP BY time_hour
+    ORDER BY total_items_count DESC;
     '''
     columns, data = utils.query(query)
     return columns, data
