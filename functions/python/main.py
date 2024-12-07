@@ -46,21 +46,21 @@ member_features = {
     1: ("個人主頁", post.post),
     2: ("發文", post.post),
     3: ("搜尋", search.search),
-    4: ("檢視貼文", text.type_of_posts),
+    4: ("檢視貼文", view.type_of_posts),
     5: ("私訊", cm_fb_ms.asdf),
-    6: ("回饋", cm_fb_ms.asdf),
+    6: ("回饋", cm_fb_ms.post_feedback),
     7: ("登出", sign.log_out)
 }
 anonym_features = {
     1: ("發文", post.post),
     2: ("搜尋", search.search),
-    3: ("檢視貼文", text.type_of_posts),
+    3: ("檢視貼文", view.type_of_posts),
     4: ("回饋", cm_fb_ms.asdf),
     5: ("登出", sign.log_out)
 }
 manager_features = {
     1: ("搜尋", search.search),
-    2: ("檢視貼文", text.type_of_posts),
+    2: ("檢視貼文", view.type_of_posts),
     3: ("檢視回饋", cm_fb_ms.asdf),
     4: ("統計數據", cm_fb_ms.asdf),
     5: ("登出", sign.log_out)
