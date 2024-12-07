@@ -28,3 +28,4 @@ def post_feedback():
         print("感謝您的回饋！已成功提交。")
     except Exception as e:
         print(f"回饋提交失敗，請重試！錯誤：{e}")
+        utils.delete_terminal_content(1.5, 2)

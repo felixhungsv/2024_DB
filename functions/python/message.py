@@ -1,5 +1,31 @@
 import utils
 
+def message_view():
+    """
+    主功能：提供顯示聯絡人名單、查看聊天記錄或發送訊息的選項。
+    """ 
+    print("功能選項：")
+    print("1. 查看與聯絡人的聊天記錄")
+    print("2. 發送訊息給最近聯絡過的用戶")
+    print("3. 發送訊息給新的用戶")
+
+    choice = input("請選擇功能：")
+
+    if choice == "1":
+        while True:
+            other_user = input("請輸入您想查看的聯絡人對話紀錄：")
+            contacts_df = message_people_view()
+            if other_user in contacts_df['the_username'].values:
+                view_chat_history(other_user)
+                break
+            print("找不到該聯絡人，請重新輸入！")
+    elif choice == "2":
+        post_message_to_old_contact()
+    elif choice == "3":
+        post_message_to_new_contact()
+    else:
+        print("輸入錯誤，請重新嘗試。")
+        
 def message_people_view():
     """
     查看最近聯絡人名單。
@@ -73,6 +99,7 @@ def post_message_to_old_contact():
         print("訊息已成功發送！")
     except Exception as e:
         print(f"訊息發送失敗，請重試！錯誤：{e}")
+        utils.delete_terminal_content(1.5, 2)
 
 def post_message_to_new_contact():
     """
@@ -88,11 +115,8 @@ def post_message_to_new_contact():
     columns, data = utils.query(query_users)
     users_df = utils.pd.DataFrame(data, columns=columns)
 
-    print("以下為可用的用戶：")
-    print(users_df)
-
     while True:
-        receivername = input("請輸入收件人的用戶名稱：")
+        receivername = input("請輸入對方的姓名：")
         if receivername in users_df['membername'].values:
             receiverID = users_df.loc[users_df['membername'] == receivername, 'memberid'].values[0]
             break
@@ -111,37 +135,6 @@ def post_message_to_new_contact():
         print("訊息已成功發送！")
     except Exception as e:
         print(f"訊息發送失敗，請重試！錯誤：{e}")
+        utils.delete_terminal_content(1.5, 2)
 
-def message_view():
-    """
-    主功能：顯示聯絡人名單，並提供查看聊天記錄或發送訊息的選項。
-    """
-    contacts_df = message_people_view()
 
-    if contacts_df.empty:
-        print("您目前沒有任何聯絡人記錄。")
-    else:
-        print("以下為您的聯絡人名單！")
-        print(contacts_df)
-        
-
-    print("功能選項：")
-    print("1. 查看與聯絡人的聊天記錄")
-    print("2. 發送訊息給最近聯絡過的用戶")
-    print("3. 發送訊息給新的用戶")
-
-    choice = input("請選擇功能：")
-
-    if choice == "1":
-        while True:
-            other_user = input("請輸入您想查看的聯絡人對話紀錄：")
-            if other_user in contacts_df['the_username'].values:
-                view_chat_history(other_user)
-                break
-            print("找不到該聯絡人，請重新輸入！")
-    elif choice == "2":
-        post_message_to_old_contact()
-    elif choice == "3":
-        post_message_to_new_contact()
-    else:
-        print("輸入錯誤，請重新嘗試。")

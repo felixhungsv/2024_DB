@@ -32,3 +32,4 @@ def post_comment():
         print("留言已成功送出！")
     except Exception as e:
         print(f"留言送出失敗，請重試！錯誤：{e}")
+        utils.delete_terminal_content(1.5, 2)
