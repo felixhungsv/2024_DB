@@ -36,7 +36,6 @@ def top_locations_analysis():
     LEFT JOIN lost_item LST ON LO.itemid = LST.itemid
     GROUP BY L.locationdescription
     ORDER BY (COUNT(DISTINCT F.itemid) + COUNT(DISTINCT LST.itemid)) DESC
-    LIMIT 10;
     '''
     columns, data = utils.query(query)
     return columns, data
@@ -46,16 +45,12 @@ def user_engagement_analysis():
     SELECT 
         U.userid,
         U.username,
-        COUNT(DISTINCT P.itemid) AS posts_count,
-        COUNT(DISTINCT C.cmcontent) AS comments_count,
-        COUNT(DISTINCT M.mgcontent) AS messages_count
+        COUNT(DISTINCT P.itemid) AS posts_count
     FROM 
         users U
     LEFT JOIN posts P ON U.userid = P.userid
-    LEFT JOIN comments C ON U.userid = C.memberid
-    LEFT JOIN message M ON U.userid = M.senderid
     GROUP BY U.userid, U.username
-    ORDER BY (COUNT(DISTINCT P.itemid) + COUNT(DISTINCT C.cmcontent) + COUNT(DISTINCT M.mgcontent)) DESC
+    ORDER BY posts_count DESC
     LIMIT 10;
     '''
     columns, data = utils.query(query)
