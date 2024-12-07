@@ -5,6 +5,8 @@ def run_analysis():
     print("1: 最常見的地點")
     print("2: 用戶參與度")
     print("3: 物品類別趨勢")
+    print("4: 報酬獎勵效果")
+    print("5: 熱門時間分析")
 
     selected_option = int(input("請輸入數字："))
     # 根據用戶選擇執行對應的分析
