@@ -22,6 +22,7 @@ with open('db_password.txt', 'r') as file:
 
 psql_conn = psycopg2.connect(f"port = '{db_port}' dbname = '{db_name}' user = 'postgres' host = 'localhost' password = '{db_password}'")
 
+
 table_names = ['item', 'lost_item', 'found_item', 'users', 'locations', 'locates', 'stores', 'returns_or_claims', 'category', 'belongs', 'posts', 'members', 'comments', 'message', 'feedback', 'notifies', 'reward']
 cursor = psql_conn.cursor()
 
