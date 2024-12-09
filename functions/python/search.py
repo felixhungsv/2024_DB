@@ -21,10 +21,7 @@ def search():
 
             # 顯示出貼文
             query_str = '''
-            SELECT 	    
-            CASE 
-                WHEN p.UserID LIKE 'US%' THEN '匿名'
-                ELSE m.AccountName END AS AccountName,
+            SELECT         
             c.categoryname, i.description, lt.locationdescription, p.posttime
             FROM posts p
             JOIN lost_item li ON li.itemid = p.itemid
@@ -32,7 +29,7 @@ def search():
             JOIN locations lt ON lt.locationid = lo.locationid
             JOIN belongs b ON b.itemid = p.itemid
             JOIN category c ON c.categoryid = b.categoryid
-            JOIN members m ON m.memberid = p.userid
+            LEFT JOIN members m ON m.memberid = p.userid
             JOIN item i ON i.itemid = p.itemid
             WHERE 1=1
             '''
@@ -51,7 +48,7 @@ def search():
                 params.append(item_location_name)
             columns, data = utils.query(query_str, tuple(params))
             dataframe = utils.pd.DataFrame(data, columns=columns)
-            dataframe.rename(columns={'accountname': '使用者名稱', "categoryname": '類別名稱', "description":"描述", "locationdescription":"地點", "posttime":"發文時間"}, inplace=True)
+            dataframe.rename(columns={"categoryname": '類別名稱', "description":"描述", "locationdescription":"地點", "posttime":"發文時間"}, inplace=True)
 
             print(dataframe)
             
@@ -75,9 +72,6 @@ def search():
             # 顯示出貼文
             query_str = '''
             SELECT 	    
-            CASE 
-                WHEN p.UserID LIKE 'US%' THEN '匿名'
-                ELSE m.AccountName END AS AccountName,
             c.categoryname, i.description, lt.locationdescription, p.posttime
             FROM posts p
             JOIN lost_item li ON li.itemid = p.itemid
@@ -107,6 +101,7 @@ def search():
             #     params.append(item_store_name)
             columns, data = utils.query(query_str, tuple(params))
             dataframe = utils.pd.DataFrame(data, columns=columns)
+            dataframe.rename(columns={"categoryname": '類別名稱', "description":"描述", "locationdescription":"地點", "posttime":"發文時間"}, inplace=True)
             print(dataframe)
 
             break
@@ -114,4 +109,4 @@ def search():
             print("輸入錯誤！請重新再試！")
             utils.delete_terminal_content(1.5,2)
 
-#search()
+search()
