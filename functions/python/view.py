@@ -7,7 +7,7 @@ def view_posts_by_comments(page=1): # 檢視貼文排序依照貼文的留言數
     posts_per_page = 5
     offset = (page - 1) * posts_per_page
 
-    utils.query = '''
+    query = '''
     WITH CommentCounts AS (
     SELECT 
         p.ItemID,
@@ -66,6 +66,7 @@ def view_posts_by_comments(page=1): # 檢視貼文排序依照貼文的留言數
         return
    
     print(page_data.drop(columns=['ClaimStatus']))  # 顯示時隱藏過濾欄位
+    return total_pages
 
 def view_posts_by_posttime(page=1): # 檢視貼文排序依照貼文發布時間
 
@@ -73,7 +74,7 @@ def view_posts_by_posttime(page=1): # 檢視貼文排序依照貼文發布時間
     posts_per_page = 5
     offset = (page - 1) * posts_per_page
     
-    utils.query = '''
+    query = '''
     WITH CommentCounts AS (
     SELECT 
         p.ItemID,
@@ -132,50 +133,51 @@ def view_posts_by_posttime(page=1): # 檢視貼文排序依照貼文發布時間
         return
    
     print(page_data.drop(columns=['ClaimStatus']))  # 顯示時隱藏過濾欄位
+    return total_pages
 
 def type_of_posts():
     print("請問要以哪種排序檢視？")
     print("1: 依照時間序  2: 依照留言數")
     type = input("請輸入數字：")
     if type == "1":
-        view_posts_by_posttime(utils.page)
+        total_pages = view_posts_by_posttime(utils.page)
     elif type == "2":
         view_posts_by_comments(utils.page)
     else:
         print("輸入錯誤！請重新再試！")
         utils.delete_terminal_content(1.5,2)
     while True:
-        print(f"\n頁數：{page}/{total_pages}")
+        print(f"\n頁數：{utils.page}/{total_pages}")
         print("請選擇：")
         print("1. 下一頁")
         print("2. 上一頁")
-	print("3: 查看留言“) 
-	print("4: 發出留言")
-	print("5: 返回")
+        print("3: 查看留言") 
+        print("4: 發出留言")
+        print("5: 返回")
         choice = input("請輸入選項（1/2）：")
         if choice == "1":
             # 查看下一頁
-            if page < total_pages:
-                view_posts_by_comments(page + 1)
+            if utils.page < total_pages:
+                view_posts_by_comments(utils.page + 1)
             else:
                 print("已經是最後一頁了！")
             break
         elif choice == "2":
             # 查看上一頁
-            if page > 1:
-                view_posts_by_comments(page - 1)
+            if utils.page > 1:
+                view_posts_by_comments(utils.page - 1)
             else:
                 print("已經是第一頁了！")
             break
-        if type == "3":
+        elif choice == "3":
             print("請輸入要查看的物品ID：")
             itemid = input("ItemID: ")
             print(comment.comment_view(itemid))
-        elif type == "4":
+        elif choice == "4":
             comment.post_comment()
-        elif type == "5":
+        elif choice == "5":
             break
-	else:
+        else:
             print("無效的選項，請重新輸入。")
 		
     
