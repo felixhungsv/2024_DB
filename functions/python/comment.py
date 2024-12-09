@@ -16,9 +16,8 @@ def comment_view(itemID):
     return utils.pd.DataFrame(data, columns=columns).sort_values("cmtime")
 
 
-def post_comment():
+def post_comment(itemID):
     utils.print_bold("發表留言")
-    itemID = input("請輸入您要留言的物品ID：")
     comment_content = input("請輸入留言內容：")
     
     query = '''
