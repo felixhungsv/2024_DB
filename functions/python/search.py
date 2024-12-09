@@ -7,23 +7,86 @@ def search():
     while True:
         type = input("請輸入數字：")
         if type == 1:
-            item_name = input("您遺失的物品名稱：")
             utils.list_category()
-            item_category = input("您遺失的物品數屬於哪個類別（請填數字）：")
-            item_time = input("您遺失的大致時間（格式為YYYY-MM-DD HH:MM:SS，可不填）：") # 要把它轉換成timestamp格式存進資料庫
+            item_category = input("您要搜尋的物品數屬於哪個類別（請填數字，可不填）：")
+            item_start_time = input("您要搜尋的開始時間（格式為YYYY-MM-DD HH:MM:SS，可不填）：")
+            if item_start_time:
+                item_end_time = input("您要搜尋的結束時間（格式為YYYY-MM-DD HH:MM:SS）：")
             utils.list_location()
-            item_location = input("您遺失的大致地點（請填數字，可不填）：")
-            print("發文成功！感謝您的參與！") # 可以接回饋
+            item_location = input("您要搜尋的物品遺失地點（請填數字，可不填）：")
+
+            # 顯示出貼文
+            query_str = '''
+            SELECT *
+            FROM posts p
+            JOIN lost_item li ON li.itemid = p.itemid
+            JOIN locates lo ON lo.itemid = p.itemid
+            JOIN locations lt ON lt.locationid = lo.locationid
+            JOIN belongs b ON b.itemid = p.itemid
+            JOIN category c ON c.categoryid = b.categoryid
+            WHERE 1=1
+            '''
+
+            params = []
+
+            if item_category:
+                query_str += ''' AND c.categoryid=%s'''
+                params.append(item_category)
+            if item_start_time:
+                query_str += ''' AND li.losttime>=%s AND li.losttime<=%s'''
+                params.append(item_start_time)
+                params.append(item_end_time)
+            if item_location:
+                query_str += ''' AND lt.locationid=%s'''
+                params.append(item_location)
+            columns, data = utils.query(query_str, tuple(params))
+            print(data)
+            
             break
         elif type == 2:
-            item_name = input("您尋獲的物品名稱：")
             utils.list_category()
-            item_category = input("您尋獲的物品數屬於哪個類別（請填數字）：")
-            item_time = input("您尋獲的大致時間（格式為YYYY-MM-DD HH:MM:SS，可不填）：") # 要把它轉換成timestamp格式存進資料庫
+            item_category = input("您要搜尋的物品數屬於哪個類別（請填數字，可不填）：")
+            item_start_time = input("您要搜尋的開始時間（格式為YYYY-MM-DD HH:MM:SS，可不填）：")
+            if item_start_time:
+                item_end_time = input("您要搜尋的結束時間（格式為YYYY-MM-DD HH:MM:SS）：")
             utils.list_location()
-            item_location = input("您尋獲的大致地點（請填數字，可不填）：")
-            item_store = input("您將物品存放在哪個地點（請填數字）：")
-            print("發文成功！感謝您的參與！") # 可以接回饋
+            item_location = input("您要搜尋的物品尋獲地點（請填數字，可不填）：")
+            item_store = input("您要搜尋的物品存放地點（請填數字，可不填）：")
+
+            # 顯示出貼文
+            query_str = '''
+            SELECT *
+            FROM posts p
+            JOIN (
+                SELECT *
+                FROM found_item fi
+                JOIN locates lo ON lo.itemid = fi.itemid
+                JOIN stores s ON s.itemid = fi.itemid
+                JOIN locations lt ON lt.locationid = lo.locationid AND lt.locationid = s.locationid
+            ) j ON j.itemid = p.itemid
+            JOIN belongs b ON b.itemid = p.itemid
+            JOIN category c ON c.categoryid = b.categoryid
+            WHERE 1=1
+            '''
+
+            params = []
+
+            if item_category:
+                query_str += ''' AND c.categoryid=%s'''
+                params.append(item_category)
+            if item_start_time:
+                query_str += ''' AND li.losttime>=%s AND li.losttime<=%s'''
+                params.append(item_start_time)
+                params.append(item_end_time)
+            if item_location:
+                query_str += ''' AND lt.locationid=%s'''
+                params.append(item_location)
+            if item_store:
+                query_str += ''' AND s.locationid=%s'''
+                params.append(item_store)
+            columns, data = utils.query(query_str, tuple(params))
+            print(data)
+
             break
         else:
             print("輸入錯誤！請重新再試！")
