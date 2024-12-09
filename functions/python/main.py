@@ -45,13 +45,12 @@ if utils.userid:
 # homepage 三種
 
 member_features = {
-    1: ("個人主頁", post.post),
-    2: ("發文", post.post),
-    3: ("搜尋", search.search),
-    4: ("檢視貼文", view.type_of_posts),
-    5: ("私訊", message.message_view),
-    6: ("回饋", feedback.post_feedback),
-    7: ("登出", sign.log_out)
+    1: ("發文", post.post),
+    2: ("搜尋", search.search),
+    3: ("檢視貼文", view.type_of_posts),
+    4: ("私訊", message.message_view),
+    5: ("回饋", feedback.post_feedback),
+    6: ("登出", sign.log_out)
 }
 anonym_features = {
     1: ("發文", post.post),
@@ -82,10 +81,12 @@ def member_homepage():
                 utils.time.sleep(2)
             else:
                 raise ValueError("輸入無效")
+            if choice == '6':
+                break
         except ValueError as e:
             print("格式錯誤！請輸入正確數字！")
             utils.delete_terminal_content(1.5, 2)
-        break
+
 def anonym_homepage():
     while True:
         utils.print_bold("功能選單")
@@ -100,10 +101,12 @@ def anonym_homepage():
                 utils.time.sleep(2)
             else:
                 raise ValueError("輸入無效")
+            if choice == '5':
+                break
         except ValueError as e:
             print("格式錯誤！請輸入正確數字！")
             utils.delete_terminal_content(1.5, 2)
-        break
+
 def manager_homepage():
     while True:
         utils.print_bold("功能選單")
@@ -118,10 +121,12 @@ def manager_homepage():
                 utils.time.sleep(2)
             else:
                 raise ValueError("輸入無效")
+            if choice == '5':
+                break
         except ValueError as e:
             print("格式錯誤！請輸入正確數字！")
             utils.delete_terminal_content(1.5, 2)
-        break
+
 
 if utils.role == "anonym": # 匿名
     anonym_homepage()
