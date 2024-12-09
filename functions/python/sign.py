@@ -207,4 +207,3 @@ def log_out():
     utils.role = ""
     utils.print_bold("Bye!")
 
-sign_in()
