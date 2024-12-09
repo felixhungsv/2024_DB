@@ -81,11 +81,12 @@ def member_homepage():
                 utils.time.sleep(2)
             else:
                 raise ValueError("輸入無效")
-            if choice == '6':
+            if choice == 6:
                 break
         except ValueError as e:
             print("格式錯誤！請輸入正確數字！")
             utils.delete_terminal_content(1.5, 2)
+    
 
 def anonym_homepage():
     while True:
@@ -101,7 +102,7 @@ def anonym_homepage():
                 utils.time.sleep(2)
             else:
                 raise ValueError("輸入無效")
-            if choice == '5':
+            if choice == 5:
                 break
         except ValueError as e:
             print("格式錯誤！請輸入正確數字！")
@@ -121,7 +122,7 @@ def manager_homepage():
                 utils.time.sleep(2)
             else:
                 raise ValueError("輸入無效")
-            if choice == '5':
+            if choice == 5:
                 break
         except ValueError as e:
             print("格式錯誤！請輸入正確數字！")

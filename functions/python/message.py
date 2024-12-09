@@ -15,7 +15,7 @@ def message_view():
         while True:
             contacts_df = message_people_view()
             print(contacts_df)
-            other_user = input("請輸入您想查看的聯絡人對話紀錄：")
+            other_user = input("請輸入您想查看的對話紀錄的聯絡人名稱：")
             if other_user in contacts_df['the_username'].values:
                 view_chat_history(other_user)
                 break
@@ -46,7 +46,7 @@ def message_people_view():
     GROUP BY the_username
     ORDER BY last_message_time DESC;
     '''
-    params = (utils.username, utils.username, utils.username)
+    params = (utils.userid, utils.userid, utils.userid)
     columns, data = utils.query(query, params)
     return utils.pd.DataFrame(data, columns=columns)
 
@@ -61,11 +61,11 @@ def view_chat_history(other_user):
     JOIN USERS AS u_s ON m.senderid = u_s.userid
     JOIN USERS AS u_r ON m.receiverid = u_r.userid
     WHERE 
-        (u_s.username = %s AND u_r.username = %s) 
-        OR (u_s.username = %s AND u_r.username = %s)
+        (senderid = %s AND u_r.username = %s) 
+        OR (u_s.username = %s AND receiverid = %s)
     ORDER BY m.mgtime DESC
     '''
-    params = (utils.username, other_user, other_user, utils.username)
+    params = (utils.userid, other_user, other_user, utils.userid)
     columns, data = utils.query(query, params)
     chat_df = utils.pd.DataFrame(data, columns=columns)
     print(chat_df)
@@ -91,9 +91,9 @@ def post_message_to_old_contact():
     
     query = '''
     INSERT INTO MESSAGE (senderid, receiverid, mgtime, mgcontent)
-    VALUES ((SELECT userid FROM USERS WHERE username = %s), (SELECT userid FROM USERS WHERE username = %s), CURRENT_TIMESTAMP, %s)
+    VALUES (%s, (SELECT userid FROM USERS WHERE username = %s), CURRENT_TIMESTAMP, %s)
     '''
-    params = (utils.username, receivername, message_content)
+    params = (utils.userid, receivername, message_content)
 
     try:
         utils.query(query, params)
@@ -137,5 +137,6 @@ def post_message_to_new_contact():
     except Exception as e:
         print(f"訊息發送失敗，請重試！錯誤：{e}")
         utils.delete_terminal_content(1.5, 2)
+        
 
 
