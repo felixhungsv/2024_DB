@@ -179,7 +179,10 @@ def type_of_posts():
             print(itemid)
             print(comment.comment_view(itemid))
         elif choice == "4":
-            comment.post_comment()
+            index = input("請輸入要留言的物品編號：")
+            itemid = df.iloc[int(index)-1]["itemid"]
+            print(itemid)
+            comment.post_comment(itemid)
         elif choice == "5":
             utils.page = 1
             return
