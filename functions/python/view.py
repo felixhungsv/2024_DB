@@ -149,6 +149,9 @@ def type_of_posts():
         print("請選擇：")
         print("1. 下一頁")
         print("2. 上一頁")
+	print("3: 查看留言“) 
+	print("4: 發出留言")
+	print("5: 返回")
         choice = input("請輸入選項（1/2）：")
         if choice == "1":
             # 查看下一頁
@@ -164,20 +167,17 @@ def type_of_posts():
             else:
                 print("已經是第一頁了！")
             break
-        else:
-            print("無效的選項，請重新輸入。")
-    while True:
-        print("請問是否要查看留言或發出留言？")
-        print("1: 查看留言  2: 發出留言 3: 返回")   
-        type = input("請輸入數字：")
-        if type == "1":
+        if type == "3":
             print("請輸入要查看的物品ID：")
             itemid = input("ItemID: ")
             print(comment.comment_view(itemid))
-        elif type == "2":
+        elif type == "4":
             comment.post_comment()
-        elif type == "3":
+        elif type == "5":
             break
+	else:
+            print("無效的選項，請重新輸入。")
+		
     
  
 
