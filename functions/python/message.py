@@ -13,8 +13,9 @@ def message_view():
 
     if choice == "1":
         while True:
-            other_user = input("請輸入您想查看的聯絡人對話紀錄：")
             contacts_df = message_people_view()
+            print(contacts_df)
+            other_user = input("請輸入您想查看的聯絡人對話紀錄：")
             if other_user in contacts_df['the_username'].values:
                 view_chat_history(other_user)
                 break

@@ -21,13 +21,19 @@ def search():
 
             # 顯示出貼文
             query_str = '''
-            SELECT *
+            SELECT 	    
+            CASE 
+                WHEN p.UserID LIKE 'US%' THEN '匿名'
+                ELSE m.AccountName END AS AccountName,
+            c.categoryname, i.description, lt.locationdescription, p.posttime
             FROM posts p
             JOIN lost_item li ON li.itemid = p.itemid
             JOIN locates lo ON lo.itemid = p.itemid
             JOIN locations lt ON lt.locationid = lo.locationid
             JOIN belongs b ON b.itemid = p.itemid
             JOIN category c ON c.categoryid = b.categoryid
+            JOIN members m ON m.memberid = p.userid
+            JOIN item i ON i.itemid = p.itemid
             WHERE 1=1
             '''
 
@@ -44,7 +50,10 @@ def search():
                 query_str += ''' AND lt.locationdescription=%s'''
                 params.append(item_location_name)
             columns, data = utils.query(query_str, tuple(params))
-            print(data)
+            dataframe = utils.pd.DataFrame(data, columns=columns)
+            dataframe.rename(columns={'accountname': '使用者名稱', "categoryname": '類別名稱', "description":"描述", "locationdescription":"地點", "posttime":"發文時間"}, inplace=True)
+
+            print(dataframe)
             
             break
         elif type == "2":
@@ -65,13 +74,19 @@ def search():
 
             # 顯示出貼文
             query_str = '''
-            SELECT *
+            SELECT 	    
+            CASE 
+                WHEN p.UserID LIKE 'US%' THEN '匿名'
+                ELSE m.AccountName END AS AccountName,
+            c.categoryname, i.description, lt.locationdescription, p.posttime
             FROM posts p
             JOIN lost_item li ON li.itemid = p.itemid
             JOIN locates lo ON lo.itemid = p.itemid
             JOIN locations lt ON lt.locationid = lo.locationid
             JOIN belongs b ON b.itemid = p.itemid
             JOIN category c ON c.categoryid = b.categoryid
+            JOIN members m ON m.memberid = p.userid
+            JOIN item i ON i.itemid = p.itemid
             WHERE 1=1
             '''
 
@@ -91,7 +106,8 @@ def search():
             #     query_str += ''' AND s.locationdescription=%s'''
             #     params.append(item_store_name)
             columns, data = utils.query(query_str, tuple(params))
-            print(data)
+            dataframe = utils.pd.DataFrame(data, columns=columns)
+            print(dataframe)
 
             break
         else:
