@@ -8,21 +8,36 @@ def view_posts_by_comments(page=1): # 檢視貼文排序依照貼文的留言數
     offset = (page - 1) * 10 # 每一頁有10個貼文
 
     columns, data = utils.query(f'''
+    WITH CommentCounts AS (
+        SELECT 
+            p.ItemID,
+            COUNT(cm.CmContent) AS CommentCount
+        FROM POSTS p
+        LEFT JOIN COMMENTS cm ON p.ItemID = cm.ItemID
+        GROUP BY p.ItemID
+    )
     SELECT 
-        p.memberid, 
-        u.username,
-        p.itemid, 
-        i.itemdescription, 
-        p.posttime, 
-        rc.status,
-        COUNT(c.comment_id) AS comment_count
-    FROM POSTS AS p
-    JOIN USERS AS u ON p.memberid = u.userid
-    JOIN ITEMS AS i ON p.itemid = i.itemid
-    LEFT JOIN COMMENTS AS c ON p.itemid = c.itemid
-    LEFT JOIN RETURNS_OR_CLAIMS AS rc ON p.itemid = rc.itemid
-    GROUP BY p.itemid
-    ORDER BY c.count(*) DESC
+        CASE 
+            WHEN p.UserID LIKE 'US%' THEN '匿名'
+            ELSE m.AccountName
+        END AS AccountName,
+        c.CategoryName AS CategoryName, 
+        i.Description AS Description, 
+        lo.LocationDescription AS LocationDescription, 
+        r.RewardName AS RewardName, 
+        r.Amount AS RewardAmount,
+        cc.CommentCount
+    FROM POSTS p
+    LEFT JOIN MEMBERS m ON p.UserID = m.MemberID
+    JOIN ITEM i ON p.ItemID = i.ItemID
+    JOIN LOCATES l ON p.ItemID = l.ItemID
+    JOIN LOCATIONS lo ON l.LocationID = lo.LocationID
+    JOIN Belongs b ON p.ItemID = b.ItemID
+    JOIN CATEGORY c ON b.CategoryID = c.CategoryID
+    LEFT JOIN REWARD r ON p.ItemID = r.ItemID
+    JOIN CommentCounts cc ON p.ItemID = cc.ItemID
+    ORDER BY cc.CommentCount DESC;
+
     LIMIT 10 OFFSET {offset}
     ''')
 
@@ -36,20 +51,25 @@ def view_posts_by_posttime(page=1): # 檢視貼文排序依照貼文發布時間
 
     columns, data = utils.query(f'''
     SELECT 
-        p.memberid, 
-        u.username,
-        p.itemid, 
-        i.itemdescription, 
-        p.posttime, 
-        rc.status,
-        COUNT(c.comment_id) AS comment_count
-    FROM POSTS AS p
-    JOIN USERS AS u ON p.memberid = u.userid
-    JOIN ITEMS AS i ON p.itemid = i.itemid
-    LEFT JOIN COMMENTS AS c ON p.itemid = c.itemid
-    LEFT JOIN RETURNS_OR_CLAIMS AS rc ON p.itemid = rc.itemid
-    GROUP BY p.itemid
-    ORDER BY p.posttime DESC
+        CASE 
+            WHEN p.UserID LIKE 'US%' THEN '匿名'
+            ELSE m.AccountName
+        END AS AccountName,
+        c.CategoryName AS CategoryName, 
+        i.Description AS Description, 
+        lo.LocationDescription AS LocationDescription, 
+        r.RewardName AS RewardName, 
+        r.Amount AS RewardAmount,
+        p.PostTime AS PostTime
+    FROM POSTS p
+    LEFT JOIN MEMBERS m ON p.UserID = m.MemberID
+    JOIN ITEM i ON p.ItemID = i.ItemID
+    JOIN LOCATES l ON p.ItemID = l.ItemID
+    JOIN LOCATIONS lo ON l.LocationID = lo.LocationID
+    JOIN Belongs b ON p.ItemID = b.ItemID
+    JOIN CATEGORY c ON b.CategoryID = c.CategoryID
+    LEFT JOIN REWARD r ON p.ItemID = r.ItemID
+    ORDER BY p.PostTime DESC;
     LIMIT 10 OFFSET {offset}
     ''')
 
