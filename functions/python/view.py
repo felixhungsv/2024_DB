@@ -2,75 +2,136 @@ import utils
 import comment
 
 def view_posts_by_comments(page=1): # 檢視貼文排序依照貼文的留言數
-    if page < 1:
-        raise ValueError("頁碼必須為 1 或更大.")
     
-    offset = (page - 1) * 10 # 每一頁有10個貼文
+    # 每頁顯示的貼文數量
+    posts_per_page = 5
+    offset = (page - 1) * posts_per_page
 
-    columns, data = utils.query(f'''
+    utils.query = '''
+    WITH CommentCounts AS (
     SELECT 
-        p.memberid, 
-        u.username,
-        p.itemid, 
-        i.itemdescription, 
-        p.posttime, 
-        rc.status,
-        COUNT(c.comment_id) AS comment_count
-    FROM POSTS AS p
-    JOIN USERS AS u ON p.memberid = u.userid
-    JOIN ITEMS AS i ON p.itemid = i.itemid
-    LEFT JOIN COMMENTS AS c ON p.itemid = c.itemid
-    LEFT JOIN RETURNS_OR_CLAIMS AS rc ON p.itemid = rc.itemid
-    GROUP BY p.itemid
-    ORDER BY c.count(*) DESC
-    LIMIT 10 OFFSET {offset}
-    ''')
+        p.ItemID,
+        COUNT(cm.CmContent) AS CommentCount
+    FROM POSTS p
+    LEFT JOIN COMMENTS cm ON p.ItemID = cm.ItemID
+    GROUP BY p.ItemID
+    ),
+    UniqueClaims AS (
+        SELECT 
+            ItemID,
+            MAX(Status) AS ClaimStatus -- 假設每個 ItemID 只有一個有效的 ClaimStatus
+        FROM RETURNS_OR_CLAIMS
+        GROUP BY ItemID
+    )
+    SELECT 
+	    CASE 
+            WHEN p.UserID LIKE 'US%' THEN '匿名'
+            ELSE m.AccountName
+        END AS AccountName,
+        c.CategoryName, 
+        i.Description, 
+        lo.LocationDescription, 
+        r.RewardName, 
+        r.Amount,
+        cc.CommentCount,
+        uc.ClaimStatus
+    FROM POSTS p
+    LEFT JOIN MEMBERS m ON p.UserID = m.MemberID
+    JOIN ITEM i ON p.ItemID = i.ItemID
+    JOIN LOCATES l ON p.ItemID = l.ItemID
+    JOIN LOCATIONS lo ON l.LocationID = lo.LocationID
+    JOIN Belongs b ON p.ItemID = b.ItemID
+    JOIN CATEGORY c ON b.CategoryID = c.CategoryID
+    LEFT JOIN REWARD r ON p.ItemID = r.ItemID
+    JOIN CommentCounts cc ON p.ItemID = cc.ItemID
+    LEFT JOIN UniqueClaims uc ON p.ItemID = uc.ItemID -- 使用去重的結果
+    ORDER BY cc.CommentCount DESC;
+    '''
+    
+    columns, data = utils.query(query)
+    df = utils.pd.DataFrame(data, columns=columns)
 
-    return utils.pd.DataFrame(data, columns=columns)
+    # 過濾已認領的貼文
+    df = df[df['ClaimStatus'] != 'S']
+
+    # 計算總頁數
+    total_posts = len(df)
+    total_pages = (total_posts + posts_per_page - 1) // posts_per_page
+
+    # 獲取當前頁面的貼文
+    page_data = df.iloc[offset:offset + posts_per_page]
+
+    if page_data.empty:
+        print("沒有更多貼文了！")
+        return
+   
+    print(page_data.drop(columns=['ClaimStatus']))  # 顯示時隱藏過濾欄位
 
 def view_posts_by_posttime(page=1): # 檢視貼文排序依照貼文發布時間
-    if page < 1:
-        raise ValueError("頁碼必須為 1 或更大")
+
+     # 每頁顯示的貼文數量
+    posts_per_page = 5
+    offset = (page - 1) * posts_per_page
     
-    offset = (page - 1) * 10
-
-    columns, data = utils.query(f'''
+    utils.query = '''
+    WITH CommentCounts AS (
     SELECT 
-        p.memberid, 
-        u.username,
-        p.itemid, 
-        i.itemdescription, 
-        p.posttime, 
-        rc.status,
-        COUNT(c.comment_id) AS comment_count
-    FROM POSTS AS p
-    JOIN USERS AS u ON p.memberid = u.userid
-    JOIN ITEMS AS i ON p.itemid = i.itemid
-    LEFT JOIN COMMENTS AS c ON p.itemid = c.itemid
-    LEFT JOIN RETURNS_OR_CLAIMS AS rc ON p.itemid = rc.itemid
-    GROUP BY p.itemid
-    ORDER BY p.posttime DESC
-    LIMIT 10 OFFSET {offset}
-    ''')
+        p.ItemID,
+        COUNT(cm.CmContent) AS CommentCount
+    FROM POSTS p
+    LEFT JOIN COMMENTS cm ON p.ItemID = cm.ItemID
+    GROUP BY p.ItemID
+    ),
+    UniqueClaims AS (
+        SELECT 
+            ItemID,
+            MAX(Status) AS ClaimStatus -- 假設每個 ItemID 只有一個有效的 ClaimStatus
+        FROM RETURNS_OR_CLAIMS
+        GROUP BY ItemID
+    )
+    SELECT 
+	    CASE 
+            WHEN p.UserID LIKE 'US%' THEN '匿名'
+            ELSE m.AccountName
+        END AS AccountName,
+        c.CategoryName, 
+        i.Description, 
+        lo.LocationDescription, 
+        r.RewardName, 
+        r.Amount,
+	    p.PostTime,
+        uc.ClaimStatus
+    FROM POSTS p
+    LEFT JOIN MEMBERS m ON p.UserID = m.MemberID
+    JOIN ITEM i ON p.ItemID = i.ItemID
+    JOIN LOCATES l ON p.ItemID = l.ItemID
+    JOIN LOCATIONS lo ON l.LocationID = lo.LocationID
+    JOIN Belongs b ON p.ItemID = b.ItemID
+    JOIN CATEGORY c ON b.CategoryID = c.CategoryID
+    LEFT JOIN REWARD r ON p.ItemID = r.ItemID
+    JOIN CommentCounts cc ON p.ItemID = cc.ItemID
+    LEFT JOIN UniqueClaims uc ON p.ItemID = uc.ItemID -- 使用去重的結果
+    ORDER BY p.PostTime DESC;
+    '''
 
-    return utils.pd.DataFrame(data, columns=columns)
+    columns, data = utils.query(query)
+    df = utils.pd.DataFrame(data, columns=columns)
 
-#def view_user_profile(user_id): # 檢視個人主頁
+    # 過濾已認領的貼文
+    df = df[df['ClaimStatus'] != 'S']
 
-    #columns, data = utils.query(f'''
-    #SELECT 
-        #u.userid,
-        #u.username,
-        #u.email,
-        #u.phonenumber,
-    #FROM USERS AS u
-    #WHERE u.userid = '{user_id}'
-    #''')
-    #return utils.pd.DataFrame(data, columns=columns)
+    # 計算總頁數
+    total_posts = len(df)
+    total_pages = (total_posts + posts_per_page - 1) // posts_per_page
 
-# user_id = 'UB07050678'  # 假設用戶的 ID 是 UB07050678
-# profile_data = view_user_profile(user_id)
-# print(profile_data)
+    # 獲取當前頁面的貼文
+    page_data = df.iloc[offset:offset + posts_per_page]
+
+    if page_data.empty:
+        print("沒有更多貼文了！")
+        return
+   
+    print(page_data.drop(columns=['ClaimStatus']))  # 顯示時隱藏過濾欄位
 
 def type_of_posts():
     print("請問要以哪種排序檢視？")
@@ -84,6 +145,28 @@ def type_of_posts():
         print("輸入錯誤！請重新再試！")
         utils.delete_terminal_content(1.5,2)
     while True:
+        print(f"\n頁數：{page}/{total_pages}")
+        print("請選擇：")
+        print("1. 下一頁")
+        print("2. 上一頁")
+        choice = input("請輸入選項（1/2）：")
+        if choice == "1":
+            # 查看下一頁
+            if page < total_pages:
+                view_posts_by_comments(page + 1)
+            else:
+                print("已經是最後一頁了！")
+            break
+        elif choice == "2":
+            # 查看上一頁
+            if page > 1:
+                view_posts_by_comments(page - 1)
+            else:
+                print("已經是第一頁了！")
+            break
+        else:
+            print("無效的選項，請重新輸入。")
+    while True:
         print("請問是否要查看留言或發出留言？")
         print("1: 查看留言  2: 發出留言 3: 返回")   
         type = input("請輸入數字：")
@@ -96,100 +179,6 @@ def type_of_posts():
         elif type == "3":
             break
     
-
-def delete_post(role, member_id=None, item_id=None): # 刪除貼文
-    
-    if role == 'Member':
-        # 會員：刪除自己的貼文
-        utils.query(f'''
-        DELETE FROM POSTS
-        WHERE UserID = '{member_id}' AND ItemID = '{item_id}'
-        ''')
-        return f"temID {item_id} 的貼文已被成功刪除。"
-    
-    elif role == 'User':
-        # 匿名用戶：只能刪除自己的貼文
-        utils.query(f'''
-        DELETE FROM POSTS
-        WHERE UserID = '{user_id}' AND ItemID = '{item_id}'
-        ''')
-        return f"ItemID {item_id} 的貼文已被成功刪除。"
-    
-    elif role == 'Manager':
-        # 業務經理者：可以刪除所有人的貼文
-        utils.query(f'''
-        DELETE FROM POSTS
-        WHERE ItemID = '{item_id}'
-        ''')
-        return f"ItemID {item_id} 的貼文已被成功刪除。"
-    
-    else:
-        raise ValueError("刪除貼文無效.")
-    
-# role = 'Manager'
-# item_id = 'IT00000001'
-
-# result = delete_post(role, item_id=item_id)
-# print(result)
-
-def delete_comment(role, member_id=None, item_id=None, commenter_id=None, comment_time=None): # 刪除留言
-    
-    if role == 'Member':
-        # 會員：只能刪除自己的留言
-        utils.query(f'''
-        DELETE FROM COMMENTS
-        WHERE MemberID = '{member_id}' AND ItemID = '{item_id}' AND CmContent = '{comment_content}'
-        ''')
-        return f"已成功刪除對 ItemID {item_id} 的評論。"
-    
-    elif role == 'Manager':
-        # 業務經理者：可以刪除所有人的留言
-        utils.query(f'''
-        DELETE FROM COMMENTS
-        WHERE ItemID = '{item_id}' AND CmContent = '{comment_content}'
-        ''')
-        return f"已成功刪除對 ItemID {item_id} 的評論。"
-    
-    else:
-        raise PermissionError("您沒有刪除評論的權限。")
-
-# role = 'Member'
-# member_id = 'UB09340643'
-# item_id = 'IT00000823'
-# comment_content = '我弄丟了它，請問可以提供更詳細的描述嗎？0'
-
-# result = delete_comment(role, member_id=member_id, item_id=item_id, comment_content=comment_content)
-# print(result)
-
-def delete_message(role, sender_id=None, receiver_id=None, message_content=None): # 刪除私訊
-    
-    if role == 'Member':
-        # 會員：只能刪除自己發送或接收的私訊
-        utils.query(f'''
-        DELETE FROM MESSAGES
-        WHERE (SenderID = '{sender_id}' OR ReceiverID = '{receiver_id}')
-          AND MgContent = '{message_content}'
-        ''')
-        return f"已成功刪除 {message_content}。"
-    
-    elif role == 'Manager':
-        # 業務經理者：可以刪除所有私訊
-        utils.query(f'''
-        DELETE FROM MESSAGES
-        WHERE MgContent = '{message_content}'
-        ''')
-        return f"已成功刪除 {message_content}。"
-    
-    else:
-        raise PermissionError("Role does not have permission to delete messages.")
-    
-# role = 'Member'
-# sender_id = 'UD01195700'
-# message_content = '我記得放在椅子上，請問可以再提供一些細節嗎？'
-
-# result = delete_message(role, sender_id=sender_id, message_content=message_content)
-# print(result)
-# 輸出：Message at 我記得放在椅子上，請問可以再提供一些細節嗎？ deleted successfully by Member.
  
 
 
