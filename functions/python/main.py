@@ -5,7 +5,7 @@ import search
 import post
 import feedback
 import message
-import stat
+import stats
 
 # 註冊/登入
 sign_features = {
@@ -64,7 +64,7 @@ manager_features = {
     1: ("搜尋", search.search),
     2: ("檢視貼文", view.type_of_posts),
     3: ("檢視回饋", feedback.feedback_view),
-    4: ("統計數據", stat.run_analysis),
+    4: ("統計數據", stats.run_analysis),
     5: ("登出", sign.log_out)
 }
 

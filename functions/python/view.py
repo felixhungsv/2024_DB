@@ -34,7 +34,8 @@ def view_posts_by_comments(page=1): # 檢視貼文排序依照貼文的留言數
         r.RewardName, 
         r.Amount,
         cc.CommentCount,
-        uc.ClaimStatus
+        uc.ClaimStatus,
+        i.ItemID
     FROM POSTS p
     LEFT JOIN MEMBERS m ON p.UserID = m.MemberID
     JOIN ITEM i ON p.ItemID = i.ItemID
@@ -52,7 +53,8 @@ def view_posts_by_comments(page=1): # 檢視貼文排序依照貼文的留言數
     df = utils.pd.DataFrame(data, columns=columns)
 
     # 過濾已認領的貼文
-    df = df[df['ClaimStatus'] != 'S']
+    df = df[df['claimstatus'] != 'S'].reset_index(drop=True)
+    df.rename(columns={'accountname': '使用者名稱', "categoryname": '類別名稱', "description":"描述", "locationdescription":"地點", "rewardname":"懸賞", "amount":"數量", "commentcount":"留言數量", "posttime":"發文時間"}, inplace=True)
 
     # 計算總頁數
     total_posts = len(df)
@@ -65,8 +67,8 @@ def view_posts_by_comments(page=1): # 檢視貼文排序依照貼文的留言數
         print("沒有更多貼文了！")
         return
    
-    print(page_data.drop(columns=['ClaimStatus']))  # 顯示時隱藏過濾欄位
-    return total_pages
+    print(page_data.drop(columns=['claimstatus']))  # 顯示時隱藏過濾欄位
+    return total_pages, page_data
 
 def view_posts_by_posttime(page=1): # 檢視貼文排序依照貼文發布時間
 
@@ -101,7 +103,8 @@ def view_posts_by_posttime(page=1): # 檢視貼文排序依照貼文發布時間
         r.RewardName, 
         r.Amount,
 	    p.PostTime,
-        uc.ClaimStatus
+        uc.ClaimStatus,
+        i.ItemID
     FROM POSTS p
     LEFT JOIN MEMBERS m ON p.UserID = m.MemberID
     JOIN ITEM i ON p.ItemID = i.ItemID
@@ -119,7 +122,8 @@ def view_posts_by_posttime(page=1): # 檢視貼文排序依照貼文發布時間
     df = utils.pd.DataFrame(data, columns=columns)
 
     # 過濾已認領的貼文
-    df = df[df['ClaimStatus'] != 'S']
+    df = df[df['claimstatus'] != 'S'].reset_index(drop=True)
+    df.rename(columns={'accountname': '使用者名稱', "categoryname": '類別名稱', "description":"描述", "locationdescription":"地點", "rewardname":"懸賞", "amount":"數量", "commentcount":"留言數量", "posttime":"發文時間"}, inplace=True)
 
     # 計算總頁數
     total_posts = len(df)
@@ -132,17 +136,17 @@ def view_posts_by_posttime(page=1): # 檢視貼文排序依照貼文發布時間
         print("沒有更多貼文了！")
         return
    
-    print(page_data.drop(columns=['ClaimStatus']))  # 顯示時隱藏過濾欄位
-    return total_pages
+    print(page_data.drop(columns=['claimstatus']))  # 顯示時隱藏過濾欄位
+    return total_pages, page_data
 
 def type_of_posts():
     print("請問要以哪種排序檢視？")
     print("1: 依照時間序  2: 依照留言數")
     type = input("請輸入數字：")
     if type == "1":
-        total_pages = view_posts_by_posttime(utils.page)
+        total_pages, df = view_posts_by_posttime(utils.page)
     elif type == "2":
-        view_posts_by_comments(utils.page)
+        total_pages, df = view_posts_by_comments(utils.page)
     else:
         print("輸入錯誤！請重新再試！")
         utils.delete_terminal_content(1.5,2)
@@ -158,25 +162,27 @@ def type_of_posts():
         if choice == "1":
             # 查看下一頁
             if utils.page < total_pages:
-                view_posts_by_comments(utils.page + 1)
+                utils.page += 1
+                view_posts_by_comments(utils.page)
             else:
                 print("已經是最後一頁了！")
-            break
         elif choice == "2":
             # 查看上一頁
             if utils.page > 1:
-                view_posts_by_comments(utils.page - 1)
+                utils.page -= 1
+                view_posts_by_comments(utils.page)
             else:
                 print("已經是第一頁了！")
-            break
         elif choice == "3":
-            print("請輸入要查看的物品ID：")
-            itemid = input("ItemID: ")
+            index = input("請輸入要查看的物品編號：")
+            itemid = df.iloc[int(index)-1]["itemid"]
+            print(itemid)
             print(comment.comment_view(itemid))
         elif choice == "4":
             comment.post_comment()
         elif choice == "5":
-            break
+            utils.page = 1
+            return
         else:
             print("無效的選項，請重新輸入。")
 		
