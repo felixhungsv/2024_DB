@@ -16,6 +16,8 @@ def handle_user_id_input():
     while True:
         user_id = input("請輸入台大證件號碼：")
         if is_valid_code(user_id):
+            return 'U' + user_id.upper()
+        elif user_id[:2].upper() == 'MG':
             return user_id.upper()
         else:
             print("格式錯誤！")
@@ -92,35 +94,36 @@ def sign_up():
         print("註冊成功！")
 
 def sign_in():
-    utils.print_bold("登入")
-    UserID = "U" + handle_user_id_input()
-    check = check_user_existence(UserID)
-    if check:
-        while True:
-            Password = input("請輸入密碼：")
-            if is_valid_password(Password) == 0:
-                print("格式錯誤！")
-                utils.delete_terminal_content(1.5, 2)
-                continue
-            query_str = '''
-            SELECT MemberID, AccountName
-            FROM members
-            WHERE MemberID=%s and Password=%s
-            '''
-            columns, data = utils.query(query_str, (UserID, Password))
-            if not data:
-                print("密碼錯誤！")
-                utils.delete_terminal_content(1.5, 2)
-                continue
-            break
-        print(columns,data)
-        account_name_index = columns.index('accountname')
-        account_name = data[0][account_name_index]
-        print(f"歡迎！{account_name}！")
-        return UserID, account_name
-    else:
-        print("查無此帳號！")
-        utils.delete_terminal_content(1.5, 2)
+    while True:
+        utils.print_bold("登入")
+        UserID = handle_user_id_input()
+        check = check_user_existence(UserID)
+        if check:
+            while True:
+                Password = input("請輸入密碼：")
+                if is_valid_password(Password) == 0:
+                    print("格式錯誤！")
+                    utils.delete_terminal_content(1.5, 2)
+                    continue
+                query_str = '''
+                SELECT MemberID, AccountName
+                FROM members
+                WHERE MemberID=%s and Password=%s
+                '''
+                columns, data = utils.query(query_str, (UserID, Password))
+                if not data:
+                    print("密碼錯誤！")
+                    utils.delete_terminal_content(1.5, 2)
+                    continue
+                break
+            print(columns,data)
+            account_name_index = columns.index('accountname')
+            account_name = data[0][account_name_index]
+            print(f"歡迎！{account_name}！")
+            return UserID, account_name
+        else:
+            print("查無此帳號！")
+            utils.delete_terminal_content(1.5, 3)
 
 def change_password():
     utils.print_bold("更改密碼")
@@ -203,3 +206,5 @@ def log_out():
     utils.username = ""
     utils.role = ""
     utils.print_bold("Bye!")
+
+sign_in()
