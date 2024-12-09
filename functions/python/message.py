@@ -34,16 +34,16 @@ def message_people_view():
     query = '''
     SELECT 
         CASE 
-            WHEN u_s.username = %s THEN u_r.username
+            WHEN m.senderid = %s THEN u_r.username
             ELSE u_s.username
         END AS the_username,
         MAX(m.mgtime) AS last_message_time
     FROM MESSAGE AS m
     JOIN USERS AS u_s ON m.senderid = u_s.userid
     JOIN USERS AS u_r ON m.receiverid = u_r.userid
-    WHERE u_s.username = %s OR u_r.username = %s
+    WHERE m.senderid = %s OR m.receiverid = %s
     GROUP BY the_username
-    ORDER BY last_message_time DESC
+    ORDER BY last_message_time DESC;
     '''
     params = (utils.username, utils.username, utils.username)
     columns, data = utils.query(query, params)
