@@ -116,7 +116,6 @@ def sign_in():
                     utils.delete_terminal_content(1.5, 2)
                     continue
                 break
-            print(columns,data)
             account_name_index = columns.index('accountname')
             account_name = data[0][account_name_index]
             print(f"歡迎！{account_name}！")
