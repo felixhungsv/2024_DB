@@ -15,7 +15,7 @@ def post():
                 utils.list_category()
                 item_category = input("您遺失的物品數屬於哪個類別（請填數字）：")
                 item_category_name = utils.category_names[int(item_category)-1]
-                item_time = input("您遺失的大致時間（格式為YYYY-MM-DD HH:MM:SS，可不填）：") # 要把它轉換成timestamp格式存進資料庫
+                item_time = input("您遺失的大致時間（格式為YYYY-MM-DD HH:MM:SS）：") # 要把它轉換成timestamp格式存進資料庫
                 utils.list_location()
                 item_location = input("您遺失的大致地點（請填數字，可不填）：")
                 if item_location:
