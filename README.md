@@ -62,7 +62,7 @@ db_name=<資料庫名稱>
 password=<資料庫密碼>
 ```
 
-接著，將資料庫備份檔`db.password.txt`匯入
+接著，將資料庫備份檔`DB_FP_Database`匯入資料庫中
 
 ### 執行方式
 
