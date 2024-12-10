@@ -10,7 +10,8 @@ def feedback_view():
     LIMIT 10
     '''
     columns, data = utils.query(query)
-    return utils.pd.DataFrame(data, columns=columns).sort_values("fbtime")
+    print(utils.pd.DataFrame(data, columns=columns).sort_values("fbtime"))
+    return 
 
     
 def post_feedback():
